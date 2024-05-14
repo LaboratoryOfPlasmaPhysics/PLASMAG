@@ -26,6 +26,8 @@ class OptimisationTab(QWidget):
         self.sa_optimisation.update_signal.connect(self.update_progress)
         self.sa_optimisation.finished_signal.connect(self.display_final_results)
 
+        self.update_hyperparameters()
+
     def setup_ui(self):
         self.layout = QVBoxLayout(self)
 
@@ -34,6 +36,8 @@ class OptimisationTab(QWidget):
         self.method_combobox.addItem("Genetic Optimization")
         self.method_combobox.addItem("Particle Swarm Optimization")
         self.method_combobox.addItem("Simulated Annealing")
+        self.method_combobox.currentIndexChanged.connect(
+            self.update_hyperparameters)  # Connect the combobox change event
         self.layout.addWidget(self.method_combobox)
 
         # Scroll area for target selection
@@ -51,6 +55,12 @@ class OptimisationTab(QWidget):
         self.target_group_box.setLayout(self.target_layout)
         self.layout.addWidget(self.target_group_box)
 
+        # Add hyperparameters section
+        self.hyperparameters_group_box = QGroupBox("Hyperparameters")
+        self.hyperparameters_layout = QVBoxLayout()
+        self.hyperparameters_group_box.setLayout(self.hyperparameters_layout)
+        self.layout.addWidget(self.hyperparameters_group_box)
+
         # Add other controls
         self.label = QLabel("Welcome to the optimisation Tab!")
         self.layout.addWidget(self.label)
@@ -63,13 +73,39 @@ class OptimisationTab(QWidget):
         self.canvas = FigureCanvas(self.figure)
         self.layout.addWidget(self.canvas)
         self.ax = self.figure.add_subplot(111)
-        self.ax.set_title('Average Fitness over Generations')
+        self.ax.set_title('Best Fitness over Generations')
         self.ax.grid()
         self.ax.semilogy()
         self.ax.set_xlabel('Generation')
-        self.ax.set_ylabel('Average Fitness')
+        self.ax.set_ylabel('Best Fitness')
 
+    def update_hyperparameters(self):
+        # Clear current hyperparameters layout
+        for i in reversed(range(self.hyperparameters_layout.count())):
+            self.hyperparameters_layout.itemAt(i).widget().deleteLater()
 
+        method = self.method_combobox.currentText()
+        if method == "Genetic Optimization":
+            self.add_hyperparameter_field("Number of Generations", "20")
+            self.add_hyperparameter_field("Population Size", "100")
+            self.add_hyperparameter_field("Mutation Rate", "0.3")
+        elif method == "Particle Swarm Optimization":
+            self.add_hyperparameter_field("w1", "0.5")
+            self.add_hyperparameter_field("c1", "1.0")
+            self.add_hyperparameter_field("c2", "1.0")
+            self.add_hyperparameter_field("Number of Particles", "50")
+            self.add_hyperparameter_field("Number of Iterations", "50")
+        elif method == "Simulated Annealing":
+            self.add_hyperparameter_field("Cooling Rate", "0.99")
+            self.add_hyperparameter_field("Initial Temperature", "5000")
+            self.add_hyperparameter_field("Number of Iterations", "2000")
+
+    def add_hyperparameter_field(self, label_text, default_value):
+        label = QLabel(label_text)
+        line_edit = QLineEdit()
+        line_edit.setText(default_value)
+        self.hyperparameters_layout.addWidget(label)
+        self.hyperparameters_layout.addWidget(line_edit)
 
     def on_optimise_clicked(self):
         """Popup message box to confirm the optimisation."""
@@ -93,7 +129,6 @@ class OptimisationTab(QWidget):
         except ValueError:
             QMessageBox.warning(self, "Invalid Input", "Please enter a valid number for the target impedance.")
 
-
     def start_optimisation(self, button):
         if button.text() == "&Yes":
             # Clear the plot
@@ -104,25 +139,46 @@ class OptimisationTab(QWidget):
             self.ax.set_xlabel('Generation')
             self.ax.set_ylabel('Average Fitness')
 
+            hyperparameters = self.get_hyperparameters()
+
             if self.method_combobox.currentText() == "Genetic Optimization":
+                self.optimisation.generations = int(hyperparameters["Number of Generations"])
+                self.optimisation.population_size = int(hyperparameters["Population Size"])
+                self.optimisation.mutation_rate = float(hyperparameters["Mutation Rate"])
                 total_iterations = self.optimisation.generations
             elif self.method_combobox.currentText() == "Particle Swarm Optimization":
+                self.pso_optimisation.w1 = float(hyperparameters["w1"])
+                self.pso_optimisation.c1 = float(hyperparameters["c1"])
+                self.pso_optimisation.c2 = float(hyperparameters["c2"])
+                self.pso_optimisation.n_particles = int(hyperparameters["Number of Particles"])
+                self.pso_optimisation.n_iterations = int(hyperparameters["Number of Iterations"])
                 total_iterations = self.pso_optimisation.n_iterations
             elif self.method_combobox.currentText() == "Simulated Annealing":
+                self.sa_optimisation.cooling_rate = float(hyperparameters["Cooling Rate"])
+                self.sa_optimisation.initial_temperature = float(hyperparameters["Initial Temperature"])
+                self.sa_optimisation.n_iterations = int(hyperparameters["Number of Iterations"])
                 total_iterations = self.sa_optimisation.n_iterations
 
-            self.progress_dialog = QProgressDialog("Optimizing...", "Abort", 0, total_iterations, self)  # Update with correct total iterations
+            self.progress_dialog = QProgressDialog("Optimizing...", "Abort", 0, total_iterations, self)
             self.progress_dialog.setModal(True)
             self.progress_dialog.show()
 
             if self.method_combobox.currentText() == "Genetic Optimization":
-                self.optimisation.start()
+                self.optimisation.start()  # Ensure GeneticOptimisation runs in a thread
             elif self.method_combobox.currentText() == "Particle Swarm Optimization":
-                self.pso_optimisation.start()
+                self.pso_optimisation.start()  # Ensure PSO runs in a thread
             elif self.method_combobox.currentText() == "Simulated Annealing":
-                self.sa_optimisation.start()
+                self.sa_optimisation.start()  # Ensure Simulated Annealing runs in a thread
         else:
             print("Optimization canceled!")
+
+    def get_hyperparameters(self):
+        hyperparameters = {}
+        for i in range(self.hyperparameters_layout.count() // 2):
+            label = self.hyperparameters_layout.itemAt(2 * i).widget().text()
+            value = self.hyperparameters_layout.itemAt(2 * i + 1).widget().text()
+            hyperparameters[label] = value
+        return hyperparameters
 
     def update_progress(self, generation, avg_fitness, best_fitness):
         if self.progress_dialog:
