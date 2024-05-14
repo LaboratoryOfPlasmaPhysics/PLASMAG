@@ -192,15 +192,29 @@ class CalculationController:
                 input parameters of the engine.
         """
         self.engine = CalculationEngine(backups_count=backups_count)
+        self.backup_count = backups_count
         self.is_data_ready = False
         self.params = None
+        self.STRATEGY_MAP = STRATEGY_MAP
 
-        for node_name, info in STRATEGY_MAP.items():
+        for node_name, info in self.STRATEGY_MAP.items():
             default_strategy = info["default"]()
             self.engine.add_or_update_node(node_name, default_strategy)
 
         if params_dict:
             self.update_parameters(params_dict)
+
+    def swap_strategy_map(self, strategy_map):
+        self.engine = CalculationEngine(backups_count=self.backup_count)
+        self.STRATEGY_MAP = strategy_map
+
+        for node_name, info in self.STRATEGY_MAP.items():
+            default_strategy = info["default"]()
+            self.engine.add_or_update_node(node_name, default_strategy)
+
+        if self.params:
+            self.update_parameters(self.params)
+
 
     def delete_spice_nodes(self, spice_nodes : list):
         for node_name in spice_nodes:
