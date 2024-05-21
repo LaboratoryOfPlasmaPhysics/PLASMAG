@@ -213,8 +213,8 @@ def create_tree(data, file_name_export, type="community", skip_frequency_vector=
         "barnesHut": {
           "gravitationalConstant": -500000,
           "centralGravity": 10,
-          "springLength": 150,
-          "springConstant": 0.01,
+          "springLength": 50,
+          "springConstant": 0.05,
           "damping": 0.09,
           "avoidOverlap": 0.1
         },
