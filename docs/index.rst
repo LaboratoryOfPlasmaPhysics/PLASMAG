@@ -10,10 +10,10 @@ Welcome to PLASMAG's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   tree_test2
-
-
-
+   main
+   controler
+   model
+   view
 
 Indices and tables
 ==================

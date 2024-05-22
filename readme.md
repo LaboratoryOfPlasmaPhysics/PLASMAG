@@ -85,7 +85,36 @@ python PLASMAG.py
 
 ## Usage
 
-TODO
+
+1. Simulation Capabilities:
+
+- Full Electrokinetic Simulation: Uses SPICE kernel via PySPICE for comprehensive electrokinetic modeling.
+- (WIP) Real Data Fitting: Incorporates a two-step data fitting tool that includes denoising and neural network fitting for accurate simulations based on measured data.
+
+2. Visualization Tools:
+
+- Adaptive Input Section: Adjusts input options based on the magnetometer parameter set.
+- Real-time Parameter Variation: Sliders and real-time calculations to visualize the impact of parameter changes.
+- Modular Plot Section: Allows up to 5 simultaneous displays of various products, providing a comprehensive view of simulation results.
+
+3. Modularity and Flexibility:
+
+- Strategy Design Pattern: Implements a modular engine design using the strategy pattern, allowing dynamic changes in computation methods and easy adaptation to new requirements.
+- Parallel Computation: Supports parallelization of computations for improved efficiency.
+- Graph Visualization Tools: Provides full graph visualization to monitor computation dependencies and processes.
+
+4. Export and Import Capabilities:
+
+- Export Data: Allows exporting of any product or parameter for plotting or later re-importation.
+
+5. Optimization Module (Work in Progress):
+
+- Genetic Optimization (DEAP): Utilizes evolutionary algorithms to find optimal parameter sets.
+- Particle Swarm Optimization: Implements swarm intelligence techniques to explore solution spaces.
+- Simulated Annealing: Employs probabilistic techniques to approximate global optimization.
+- Mono-parameter and Multi-parameter Optimization: Supports optimization for single and multiple parameters.
+- Mono-criteria and Multi-criteria Optimization: Handles single and multiple criteria, combining them into a single framework using weighted polynomials.
+
 
 ## Availables Models
 
@@ -124,4 +153,8 @@ The project is open to contributions. Please refer to the [CONTRIBUTING.md](CONT
 
 ## Acknowledgments
 
-TODO
+- **Maxime RONCERAY** - Developer - LPP/CNRS/X [contact-me](mailto:ronceray.maxime@gmail.com)
+- **Malik MANSOUR** - Supervisor - LPP/CNRS/X [malik.mansour@lpp.polytechnique.fr](mailto:malik.mansour@lpp.polytechnique.fr)
+- **Claire REVILLET** - IT/Dev supervisor - CNRS Orleans/LPC2E
+- **Guillaume JANNET** - Electronics Engineer - CNRS Orleans/LPC2E
+
