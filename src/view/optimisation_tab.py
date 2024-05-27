@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QProgressDialog, QGroupBox, \
-    QComboBox, QLineEdit
+    QComboBox, QLineEdit, QTableWidgetItem, QTableWidget
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -7,6 +7,8 @@ from src.model.optimisation.simulated_annealing import SimulatedAnnealing
 from src.model.optimisation.genetic_optimisation import GeneticOptimisation, parameters_dict
 from src.model.optimisation.particle_swarm_optimisation import ParticleSwarmOptimization
 
+
+from PyQt6.QtGui import QDoubleValidator, QColor
 
 class OptimisationTab(QWidget):
     def __init__(self, parent=None):
@@ -36,8 +38,7 @@ class OptimisationTab(QWidget):
         self.method_combobox.addItem("Genetic Optimization")
         self.method_combobox.addItem("Particle Swarm Optimization")
         self.method_combobox.addItem("Simulated Annealing")
-        self.method_combobox.currentIndexChanged.connect(
-            self.update_hyperparameters)  # Connect the combobox change event
+        self.method_combobox.currentIndexChanged.connect(self.update_hyperparameters)  # Connect the combobox change event
         self.layout.addWidget(self.method_combobox)
 
         # Scroll area for target selection
@@ -46,11 +47,21 @@ class OptimisationTab(QWidget):
 
         self.target_combobox = QComboBox()
         self.target_combobox.addItem("Impedance")
+        self.target_combobox.addItem("NEMI")
+        self.target_combobox.currentIndexChanged.connect(self.update_target)
         self.target_layout.addWidget(self.target_combobox)
 
         self.target_value_input = QLineEdit()
         self.target_value_input.setPlaceholderText("Enter target impedance value")
         self.target_layout.addWidget(self.target_value_input)
+
+        # NEMI table setup
+        self.nemi_table = QTableWidget(3, 1)
+        self.nemi_table.setHorizontalHeaderLabels(["Column 1"])
+        self.nemi_table.setVerticalHeaderLabels(["Freq", "NEMI Value", "Weight"])
+        self.nemi_table.setVisible(False)
+        self.nemi_table.itemChanged.connect(self.on_nemi_table_item_changed)
+        self.target_layout.addWidget(self.nemi_table)
 
         self.target_group_box.setLayout(self.target_layout)
         self.layout.addWidget(self.target_group_box)
@@ -107,17 +118,86 @@ class OptimisationTab(QWidget):
         self.hyperparameters_layout.addWidget(label)
         self.hyperparameters_layout.addWidget(line_edit)
 
+    def update_target(self):
+        if self.target_combobox.currentText() == "NEMI":
+            self.target_value_input.setVisible(False)
+            self.nemi_table.setVisible(True)
+        else:
+            self.target_value_input.setVisible(True)
+            self.nemi_table.setVisible(False)
+
+    def on_nemi_table_item_changed(self, item):
+        self.validate_nemi_table()
+
+        if item.column() == self.nemi_table.columnCount() - 1 and item.text():
+            self.nemi_table.setColumnCount(self.nemi_table.columnCount() + 1)
+            self.nemi_table.setHorizontalHeaderItem(self.nemi_table.columnCount() - 1,
+                                                    QTableWidgetItem(f"Column {self.nemi_table.columnCount()}"))
+
+        empty_columns = 0
+        for col in range(self.nemi_table.columnCount()):
+            is_empty = True
+            for row in range(self.nemi_table.rowCount()):
+                if self.nemi_table.item(row, col) and self.nemi_table.item(row, col).text():
+                    is_empty = False
+                    break
+            if is_empty:
+                empty_columns += 1
+            if empty_columns >= 2:
+                self.nemi_table.setColumnCount(self.nemi_table.columnCount() - 1)
+                self.nemi_table.setHorizontalHeaderItem(self.nemi_table.columnCount() - 1,
+                                                        QTableWidgetItem(f"Column {self.nemi_table.columnCount()}"))
+                empty_columns -= 1
+
+    def validate_nemi_table(self):
+        weight_sum = 0
+        is_valid = True
+        for row in range(self.nemi_table.rowCount()):
+            for col in range(self.nemi_table.columnCount()):
+                item = self.nemi_table.item(row, col)
+                if item:
+                    try:
+                        value = float(item.text())
+                        if row == 2:
+                            weight_sum += value
+                        item.setBackground(QColor(255, 255, 255))
+                    except ValueError:
+                        item.setBackground(QColor(255, 0, 0))
+                        is_valid = False
+
+        # Validate the sum of weights
+        if abs(weight_sum - 1) > 1e-6:  # Allowing a small tolerance
+            for col in range(self.nemi_table.columnCount()):
+                item = self.nemi_table.item(2, col)
+                if item:
+                    item.setBackground(QColor(255, 0, 0))
+            is_valid = False
+        else:
+            for col in range(self.nemi_table.columnCount()):
+                item = self.nemi_table.item(2, col)
+                if item and item.background() == QColor(255, 0, 0):
+                    item.setBackground(QColor(255, 255, 255))
+
+        return is_valid
+
     def on_optimise_clicked(self):
         """Popup message box to confirm the optimisation."""
         try:
-            target_value = float(self.target_value_input.text())
-            # Update target resonance frequency based on the selected method
-            if self.method_combobox.currentText() == "Genetic Optimization":
-                self.optimisation.update_target_resonance_freq(target_value)
-            elif self.method_combobox.currentText() == "Particle Swarm Optimization":
-                self.pso_optimisation.update_target_resonance_freq(target_value)
-            elif self.method_combobox.currentText() == "Simulated Annealing":
-                self.sa_optimisation.update_target_resonance_freq(target_value)
+            if self.target_combobox.currentText() == "NEMI":
+                if not self.validate_nemi_table():
+                    QMessageBox.warning(self, "Invalid Input", "Please correct the invalid inputs in the NEMI table.")
+                    return
+                target_value = self.get_nemi_table_values()
+            else:
+                target_value = float(self.target_value_input.text())
+                # Update target resonance frequency based on the selected method
+                if self.method_combobox.currentText() == "Genetic Optimization":
+                    self.optimisation.update_target_resonance_freq(target_value)
+                elif self.method_combobox.currentText() == "Particle Swarm Optimization":
+                    self.pso_optimisation.update_target_resonance_freq(target_value)
+                elif self.method_combobox.currentText() == "Simulated Annealing":
+                    self.sa_optimisation.update_target_resonance_freq(target_value)
+
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Icon.Information)
             msg.setText("Do you really want to start the optimisation process, it can take few minutes ?")
@@ -128,6 +208,24 @@ class OptimisationTab(QWidget):
             msg.exec()
         except ValueError:
             QMessageBox.warning(self, "Invalid Input", "Please enter a valid number for the target impedance.")
+
+    def get_nemi_table_values(self):
+        nemi_values = {"Freq": [], "NEMI Value": [], "Weight": []}
+        for row in range(self.nemi_table.rowCount()):
+            for col in range(self.nemi_table.columnCount()):
+                item = self.nemi_table.item(row, col)
+                if item and item.text():
+                    if row == 0:
+                        nemi_values["Freq"].append(float(item.text()))
+                    elif row == 1:
+                        nemi_values["NEMI Value"].append(float(item.text()))
+                    elif row == 2:
+                        nemi_values["Weight"].append(float(item.text()))
+                else:
+                    nemi_values["Freq"].append(0)
+                    nemi_values["NEMI Value"].append(0)
+                    nemi_values["Weight"].append(0)
+        return nemi_values
 
     def start_optimisation(self, button):
         if button.text() == "&Yes":
@@ -210,10 +308,6 @@ class OptimisationTab(QWidget):
             print("Optimisation started !")
         else:
             print("Optimisation canceled !")
-
-
-
-
 
 
 
