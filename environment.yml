@@ -24,3 +24,4 @@ dependencies:
       - python-louvain==0.16
       - pyvis==0.3.2
       - seaborn==0.13.2
+      - sphinx_rtd_theme==2.0.0
