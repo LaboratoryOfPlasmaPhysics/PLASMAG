@@ -4,13 +4,30 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageB
     QComboBox, QLineEdit, QTableWidgetItem, QTableWidget, QDialog, QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from pint import UnitRegistry
 
 from src.model.optimisation.simulated_annealing import SimulatedAnnealing
 from src.model.optimisation.genetic_optimisation import GeneticOptimisation, parameters_dict
 from src.model.optimisation.particle_swarm_optimisation import ParticleSwarmOptimization
 
-
 from PyQt6.QtGui import QDoubleValidator, QColor
+
+
+ureg: UnitRegistry = UnitRegistry()
+def convert_unit(value, from_unit, to_unit):
+    """
+    Converts the given value from one unit to another using Pint.
+    Args:
+        value (float): The value to convert.
+        from_unit (str): The unit of the input value.
+        to_unit (str): The target unit for the conversion.
+    Returns:
+        float: The converted value.
+    """
+    if from_unit and to_unit:
+        return (value * ureg(from_unit)).to(ureg(to_unit)).magnitude
+    return value
+
 
 class OptimisationTab(QWidget):
     def __init__(self, gui ,parent=None):
@@ -341,6 +358,16 @@ class OptimisationTab(QWidget):
                     continue
                 for param, value in params.items():
                     if str(param) in final_params.keys():
+                        input_unit = input_parameters_copy[section][param]["input_unit"]
+                        target_unit = input_parameters_copy[section][param]["target_unit"]
+
+                        converted_value = convert_unit(final_params[param], target_unit, input_unit)
+
+                        # only keep 3 decimal places
+                        converted_value = round(converted_value, 3)
+
+                        final_params[param] = converted_value
+
                         input_parameters_copy[section][param]["default"] = final_params[param]
                         print("Updated parameter:", param, "with value:", final_params[param])
 
