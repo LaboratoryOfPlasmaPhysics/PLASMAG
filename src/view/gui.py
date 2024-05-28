@@ -844,7 +844,7 @@ class MainGUI(QMainWindow):
         self.param_tab = QWidget()  # QWidget that will contain the parameters layout as a tab
         self.strategy_tab = QWidget()  # QWidget that will contain the strategy selection layout as a tab
         self.spice_tab = QWidget()  # QWidget that will contain the spice layout as a tab
-        self.optimisation_tab = OptimisationTab()  # QWidget that will contain the optimisation layout as a tab
+        self.optimisation_tab = OptimisationTab(self)  # QWidget that will contain the optimisation layout as a tab
         self.EMC_tab = QWidget()  # QWidget that will contain the EMC layout as a tab
 
         self.params_layout = QVBoxLayout(self.param_tab)
@@ -1213,7 +1213,7 @@ class MainGUI(QMainWindow):
         except Exception as e:
             self.display_error(f"Error exporting parameters: {e}")
 
-    def import_parameters_from_json(self):
+    def import_parameters_from_json(self, need_filename=True, path=None):
         """
         Imports input parameters from a JSON file.
         The user is prompted to select a file to import the parameters from.
@@ -1222,7 +1222,11 @@ class MainGUI(QMainWindow):
         """
         # Show an open file dialog to the user
         try:
-            fileName, _ = QFileDialog.getOpenFileName(self, "Import Parameters", "", "JSON Files (*.json)")
+            if need_filename:
+                fileName, _ = QFileDialog.getOpenFileName(self, "Import Parameters", "", "JSON Files (*.json)")
+            else:
+                if path is not None:
+                    fileName = path
             if fileName:
                 # If a file is selected, load the parameters from that file
                 with open(fileName, 'r', encoding="utf-8") as json_file:
