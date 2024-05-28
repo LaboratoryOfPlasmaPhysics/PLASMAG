@@ -1,5 +1,7 @@
+import json
+
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QProgressDialog, QGroupBox, \
-    QComboBox, QLineEdit, QTableWidgetItem, QTableWidget
+    QComboBox, QLineEdit, QTableWidgetItem, QTableWidget, QDialog, QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -11,8 +13,9 @@ from src.model.optimisation.particle_swarm_optimisation import ParticleSwarmOpti
 from PyQt6.QtGui import QDoubleValidator, QColor
 
 class OptimisationTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, gui ,parent=None):
         super().__init__(parent)
+        self.gui = gui
         self.setup_ui()
 
         self.optimisation = GeneticOptimisation(100, 20, 0.3, parameters_dict, target_resonance_freq=24430)
@@ -152,31 +155,30 @@ class OptimisationTab(QWidget):
     def validate_nemi_table(self):
         weight_sum = 0
         is_valid = True
-        for row in range(self.nemi_table.rowCount()):
-            for col in range(self.nemi_table.columnCount()):
-                item = self.nemi_table.item(row, col)
-                if item:
-                    try:
-                        value = float(item.text())
-                        if row == 2:
-                            weight_sum += value
-                        item.setBackground(QColor(255, 255, 255))
-                    except ValueError:
-                        item.setBackground(QColor(255, 0, 0))
-                        is_valid = False
+        self.nemi_table.blockSignals(True)  # Block signals temporarily
+        try:
+            for row in range(self.nemi_table.rowCount()):
+                for col in range(self.nemi_table.columnCount()):
+                    item = self.nemi_table.item(row, col)
+                    if item:
+                        try:
+                            value = float(item.text())
+                            if row == 2:
+                                weight_sum += value
+                            item.setBackground(QColor(255, 255, 255))  # Set to white for valid input
+                        except ValueError:
+                            item.setBackground(QColor(255, 0, 0))  # Set to red for invalid input
+                            is_valid = False
 
-        # Validate the sum of weights
-        if abs(weight_sum - 1) > 1e-6:  # Allowing a small tolerance
-            for col in range(self.nemi_table.columnCount()):
-                item = self.nemi_table.item(2, col)
-                if item:
-                    item.setBackground(QColor(255, 0, 0))
-            is_valid = False
-        else:
-            for col in range(self.nemi_table.columnCount()):
-                item = self.nemi_table.item(2, col)
-                if item and item.background() == QColor(255, 0, 0):
-                    item.setBackground(QColor(255, 255, 255))
+            if weight_sum != 1:
+                print("Weight sum is not equal to 1")
+                is_valid = False
+                for col in range(self.nemi_table.columnCount()):
+                    item = self.nemi_table.item(2, col)
+                    if item:
+                        item.setBackground(QColor(255, 0, 0))  # Highlight the weight row if sum is not 1
+        finally:
+            self.nemi_table.blockSignals(False)  # Unblock signals
 
         return is_valid
 
@@ -295,13 +297,83 @@ class OptimisationTab(QWidget):
                 self.progress_dialog.close()
 
     def display_final_results(self, final_params, final_resonance_freq):
-        if self.progress_dialog:
-            self.progress_dialog.close()
-        message = (f"Optimization Completed!\n\n"
-                   f"Final Resonance Frequency: {final_resonance_freq:.2f}\n"
-                   f"Final Parameters:\n{final_params}")
-        QMessageBox.information(self, "Optimisation Results", message)
+        result_dialog = QDialog(self)
+        result_dialog.setWindowTitle("Optimisation Results")
 
+        layout = QVBoxLayout(result_dialog)
+
+        results_text = f"<h2>Optimization Completed!</h2>"
+        results_text += f"<p><b>Final Resonance Frequency:</b> {final_resonance_freq:.2f}</p>"
+        results_text += "<p><b>Final Parameters:</b></p><ul>"
+        for param, value in final_params.items():
+            formatted_value = "{:.2e}".format(value)
+            results_text += f"<li><b>{param}:</b> {formatted_value}</li>"
+        results_text += "</ul>"
+
+        results_label = QLabel(results_text)
+        results_label.setWordWrap(True)
+        layout.addWidget(results_label)
+
+        save_button = QPushButton("Save Results")
+        save_button.clicked.connect(lambda: self.save_results(final_params, final_resonance_freq))
+        layout.addWidget(save_button)
+
+        result_dialog.setLayout(layout)
+        result_dialog.exec()
+
+
+    def save_results(self, final_params, final_resonance_freq):
+        try :
+            path, _ = QFileDialog.getSaveFileName(self, "Export Optimisation data", "", "json Files (*.png)")
+            if not path:
+                return
+
+            print("Saving results to:", path)
+            print(final_params)
+
+            input_parameters_copy = self.gui.input_parameters.copy()
+
+            print(input_parameters_copy)
+
+            # Update the input parameters with the final results
+            for section, params in input_parameters_copy.items():
+                if section == "SPICE_circuit" or section == "SPICE":
+                    continue
+                for param, value in params.items():
+                    if str(param) in final_params.keys():
+                        input_parameters_copy[section][param]["default"] = final_params[param]
+                        print("Updated parameter:", param, "with value:", final_params[param])
+
+            self.saved_path = path
+
+            try :
+                # Retrieve the currelnly selected SPICE circuit from the combo box
+                selected_circuit = self.gui.spice_circuit_combo.currentText()
+
+                # Add the selected SPICE circuit to the updated parameters
+                input_parameters_copy["SPICE_circuit"] = selected_circuit
+            except Exception as e:
+                print(f"Error adding SPICE circuit to updated parameters: {e}")
+                pass
+
+            # Save the results to a file
+            with open(path, 'w') as file:
+                json.dump(input_parameters_copy, file, indent=4)
+
+            self.reload_on_gui()
+
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Invalid File", "Please enter a valid file name.")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"An error occurred while saving the results: {e}")
+
+
+    def reload_on_gui(self):
+        # Update the input parameters
+        self.gui.import_parameters_from_json(path=self.saved_path, need_filename=False)
+        self.gui.tabs.setCurrentIndex(0)
+        print("saving json")
     def on_message_box_clicked(self, button):
         """Handle the message box button clicked event."""
         if button.text() == "&Yes":
