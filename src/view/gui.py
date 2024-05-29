@@ -925,7 +925,7 @@ class MainGUI(QMainWindow):
         export_action.triggered.connect(self.export_parameters_to_json)
 
         import_action = file_menu.addAction('&Import Parameters')
-        import_action.triggered.connect(self.import_parameters_from_json)
+        import_action.triggered.connect(lambda _: self.import_parameters_from_json(need_filename=True))
 
         import_specific_action = file_menu.addAction('&Import Flicker Params')
         import_specific_action.triggered.connect(self.import_flicker_data_from_json)
@@ -1222,6 +1222,7 @@ class MainGUI(QMainWindow):
         """
         # Show an open file dialog to the user
         try:
+            filename = None
             if need_filename:
                 fileName, _ = QFileDialog.getOpenFileName(self, "Import Parameters", "", "JSON Files (*.json)")
             else:
@@ -1459,10 +1460,10 @@ class MainGUI(QMainWindow):
         :return:
         """
         # Show an error message to the user
-        print(f"Calculation failed: {error_message}")
+        print(f"{error_message}")
         # use a QMessageBox for GUI error display
 
-        QMessageBox.critical(self, "An error occurred", f"Calculation failed: {error_message}")
+        QMessageBox.critical(self, "An error occurred", f"{error_message}")
 
     def update_plot(self, index):
         def plot_curve(data_with_meta, x_vector, linestyle='-', color=None):
