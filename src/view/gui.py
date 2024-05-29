@@ -1719,7 +1719,11 @@ class MainGUI(QMainWindow):
                         print(f"Invalid input for parameter '{param}': '{text}'. Skipping calculation.")
                         return
 
-        self.controller.set_node_strategy(node_name, strategy_class, params_dict)
+        try :
+            self.controller.set_node_strategy(node_name, strategy_class, params_dict)
+        except Exception as e:
+            self.display_error(f"Error updating strategy for {node_name}: {e}")
+
         self.calculate()
 
     def save_results(self, index, button):
