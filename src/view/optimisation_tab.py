@@ -132,6 +132,12 @@ class OptimisationTab(QWidget):
             self.add_hyperparameter_field("Number of Iterations", "2000")
 
     def add_hyperparameter_field(self, label_text, default_value):
+        """
+        Add a hyperparameter field to the layout.
+        :param label_text:
+        :param default_value:
+        :return:
+        """
         label = QLabel(label_text)
         line_edit = QLineEdit()
         line_edit.setText(default_value)
@@ -139,6 +145,10 @@ class OptimisationTab(QWidget):
         self.hyperparameters_layout.addWidget(line_edit)
 
     def update_target(self):
+        """
+        Update the target input based on the selected target.
+        :return:
+        """
         if self.target_combobox.currentText() == "NEMI":
             self.target_value_input.setVisible(False)
             self.nemi_table.setVisible(True)
@@ -147,6 +157,11 @@ class OptimisationTab(QWidget):
             self.nemi_table.setVisible(False)
 
     def on_nemi_table_item_changed(self, item):
+        """
+        Handle the NEMI table item changed event.
+        :param item: updated cell item
+        :return:
+        """
         self.validate_nemi_table()
 
         if item.column() == self.nemi_table.columnCount() - 1 and item.text():
@@ -170,6 +185,12 @@ class OptimisationTab(QWidget):
                 empty_columns -= 1
 
     def validate_nemi_table(self):
+        """
+        Table validator for NEMI values.
+        If the sum of the weights is not equal to 1, the weight row is highlighted in red.
+        If any of the values are invalid, the corresponding cell is highlighted in red.
+        :return:
+        """
         weight_sum = 0
         is_valid = True
         self.nemi_table.blockSignals(True)  # Block signals temporarily
@@ -229,6 +250,10 @@ class OptimisationTab(QWidget):
             QMessageBox.warning(self, "Invalid Input", "Please enter a valid number for the target impedance.")
 
     def get_nemi_table_values(self):
+        """
+        Get the values from the table.
+        :return:
+        """
         nemi_values = {"Freq": [], "NEMI Value": [], "Weight": []}
         for row in range(self.nemi_table.rowCount()):
             for col in range(self.nemi_table.columnCount()):
@@ -247,6 +272,11 @@ class OptimisationTab(QWidget):
         return nemi_values
 
     def start_optimisation(self, button):
+        """
+        Start the optimisation process, core function to handle the message box button clicked event.
+        :param button:
+        :return:
+        """
         if button.text() == "&Yes":
             # Clear the plot
             self.ax.clear()
@@ -290,6 +320,10 @@ class OptimisationTab(QWidget):
             print("Optimization canceled!")
 
     def get_hyperparameters(self):
+        """
+        Get the hyperparameters from the input fields.
+        :return:
+        """
         hyperparameters = {}
         for i in range(self.hyperparameters_layout.count() // 2):
             label = self.hyperparameters_layout.itemAt(2 * i).widget().text()
@@ -298,6 +332,13 @@ class OptimisationTab(QWidget):
         return hyperparameters
 
     def update_progress(self, generation, avg_fitness, best_fitness):
+        """
+        Update the progress dialog and plot the best fitness over generations.
+        :param generation: actual generation
+        :param avg_fitness: average fitness of the generation
+        :param best_fitness: best fitness of the generation
+        :return:
+        """
         if self.progress_dialog:
             self.progress_dialog.setValue(generation)
             self.ax.plot(generation, best_fitness, 'ro-')  # Plot each point as it comes in
@@ -309,11 +350,20 @@ class OptimisationTab(QWidget):
             elif self.method_combobox.currentText() == "Simulated Annealing":
                 total_generations = self.sa_optimisation.n_iterations
 
-            if generation == total_generations - 1:
+            if generation == total_generations:
                 self.progress_dialog.setValue(total_generations)
                 self.progress_dialog.close()
 
     def display_final_results(self, final_params, final_resonance_freq):
+        """
+        Display the final results of the optimisation.
+        :param final_params: best parameters found
+        :param final_resonance_freq:
+        :return:
+        """
+
+        self.progress_dialog.close()
+
         result_dialog = QDialog(self)
         result_dialog.setWindowTitle("Optimisation Results")
 
@@ -327,21 +377,40 @@ class OptimisationTab(QWidget):
             results_text += f"<li><b>{param}:</b> {formatted_value}</li>"
         results_text += "</ul>"
 
+        self.save_results(final_params, export_specific_path=False, reload_to_parameters=False)
+
         results_label = QLabel(results_text)
         results_label.setWordWrap(True)
         layout.addWidget(results_label)
 
         save_button = QPushButton("Save Results")
-        save_button.clicked.connect(lambda: self.save_results(final_params, final_resonance_freq))
+        save_button.clicked.connect(lambda: self.save_results(final_params, export_specific_path=True))
+        layout.addWidget(save_button)
+
+        save_button = QPushButton("Load to parameters")
+        save_button.clicked.connect(lambda: self.save_results(final_params, export_specific_path=False))
         layout.addWidget(save_button)
 
         result_dialog.setLayout(layout)
         result_dialog.exec()
 
 
-    def save_results(self, final_params, final_resonance_freq):
+    def save_results(self, final_params, reload_to_parameters = False,export_specific_path = False):
+        """
+        Used to save the results of the optimisation to a JSON file or reload the results to the input parameters.
+        Also create a temp.json file in the output folder to not lose the results.
+        :param final_params: best parameters found
+        :param reload_to_parameters: boolean to reload the results to the input parameters
+        :param export_specific_path: boolean to export the results to a specific path
+        :return:
+        """
         try :
-            path, _ = QFileDialog.getSaveFileName(self, "Export Optimisation data", "", "json Files (*.png)")
+            if not export_specific_path:
+                # default path output/temp.json
+                path = "output/temp.json"
+            else :
+                path, _ = QFileDialog.getSaveFileName(self, "Export Optimisation data", "", "json Files (*.png)")
+
             if not path:
                 return
 
@@ -386,8 +455,8 @@ class OptimisationTab(QWidget):
             # Save the results to a file
             with open(path, 'w') as file:
                 json.dump(input_parameters_copy, file, indent=4)
-
-            self.reload_on_gui()
+            if reload_to_parameters:
+                self.reload_on_gui()
 
         except FileNotFoundError:
             QMessageBox.warning(self, "Invalid File", "Please enter a valid file name.")
@@ -397,6 +466,10 @@ class OptimisationTab(QWidget):
 
 
     def reload_on_gui(self):
+        """
+        Reload the results to the input parameters.
+        :return:
+        """
         # Update the input parameters
         self.gui.import_parameters_from_json(path=self.saved_path, need_filename=False)
         self.gui.tabs.setCurrentIndex(0)
