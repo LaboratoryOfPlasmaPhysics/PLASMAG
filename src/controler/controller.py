@@ -22,7 +22,7 @@ from src.model.engine import CalculationEngine
 from src.model.strategies.strategy_lib.Nz import AnalyticalNzStrategy
 from src.model.strategies.strategy_lib.capacitance import AnalyticalCapacitanceStrategy
 from src.model.strategies.strategy_lib.frequency import FrequencyVectorStrategy
-from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrategy
+from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrategy, AnalyticalImpedanceStrategy_hsw
 from src.model.strategies.strategy_lib.inductance import AnalyticalInductanceStrategy
 from src.model.strategies.strategy_lib.lambda_strategy import AnalyticalLambdaStrategy
 from src.model.strategies.strategy_lib.mu_app import AnalyticalMu_appStrategy
@@ -63,7 +63,7 @@ STRATEGY_MAP = {
     },
     "impedance": {
         "default": AnalyticalImpedanceStrategy,
-        "strategies": [AnalyticalImpedanceStrategy]
+        "strategies": [AnalyticalImpedanceStrategy, AnalyticalImpedanceStrategy_hsw]
     },
     "TF_ASIC_Stage_1": {
         "default": TF_ASIC_Stage_1_Strategy_linear,

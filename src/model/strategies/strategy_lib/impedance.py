@@ -31,3 +31,4 @@ class AnalyticalImpedanceStrategy(CalculationStrategy):
     @staticmethod
     def get_dependencies():
         return ['resistance', 'inductance', 'capacitance', 'frequency_vector']
+
