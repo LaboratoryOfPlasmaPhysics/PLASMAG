@@ -156,23 +156,7 @@ STRATEGY_MAP = {
     "NEMI_FIltered": {
         "default": NEMI_FIltered,
         "strategies": [NEMI_FIltered,NEMI_FIlteredv2, NEMI_FIlteredv3]
-    },
-    # "SPICE_test": {
-    #     "default": SPICE_test,
-    #     "strategies": [SPICE_test]
-    # },
-    # "SPICE_op_Amp_gain" : {
-    #     "default": SPICE_op_Amp_gain,
-    #     "strategies": [SPICE_op_Amp_gain]
-    # },
-    # "SPICE_op_Amp_transcient": {
-    #     "default": SPICE_op_Amp_transcient,
-    #     "strategies": [SPICE_op_Amp_transcient]
-    # },
-    # "SPICE_impedance" : {
-    #     "default": SPICE_impedance,
-    #     "strategies": [SPICE_impedance]
-    # }
+    }
 }
 class CalculationController:
     """

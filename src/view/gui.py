@@ -870,7 +870,7 @@ class MainGUI(QMainWindow):
 
         self.tabs.addTab(self.param_tab, "Parameters")
         self.tabs.addTab(self.strategy_tab, "Strategy Selection")
-        self.tabs.addTab(self.spice_tab, "Spice Simulation")
+        #self.tabs.addTab(self.spice_tab, "Spice Simulation")
         self.tabs.addTab(self.optimisation_tab, "Optimisation")
         self.tabs.addTab(self.EMC_tab, "EMC")
 

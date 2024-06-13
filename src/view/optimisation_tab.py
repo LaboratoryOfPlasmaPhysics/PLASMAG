@@ -67,7 +67,7 @@ class OptimisationTab(QWidget):
 
         self.target_combobox = QComboBox()
         self.target_combobox.addItem("Impedance")
-        self.target_combobox.addItem("NEMI")
+        self.target_combobox.addItem("NEMI(WIP)")
         self.target_combobox.currentIndexChanged.connect(self.update_target)
         self.target_layout.addWidget(self.target_combobox)
 
@@ -149,7 +149,7 @@ class OptimisationTab(QWidget):
         Update the target input based on the selected target.
         :return:
         """
-        if self.target_combobox.currentText() == "NEMI":
+        if self.target_combobox.currentText() == "NEMI(WIP)":
             self.target_value_input.setVisible(False)
             self.nemi_table.setVisible(True)
         else:
@@ -208,13 +208,6 @@ class OptimisationTab(QWidget):
                             item.setBackground(QColor(255, 0, 0))  # Set to red for invalid input
                             is_valid = False
 
-            if weight_sum != 1:
-                print("Weight sum is not equal to 1")
-                is_valid = False
-                for col in range(self.nemi_table.columnCount()):
-                    item = self.nemi_table.item(2, col)
-                    if item:
-                        item.setBackground(QColor(255, 0, 0))  # Highlight the weight row if sum is not 1
         finally:
             self.nemi_table.blockSignals(False)  # Unblock signals
 
@@ -223,7 +216,7 @@ class OptimisationTab(QWidget):
     def on_optimise_clicked(self):
         """Popup message box to confirm the optimisation."""
         try:
-            if self.target_combobox.currentText() == "NEMI":
+            if self.target_combobox.currentText() == "NEMI(WIP)":
                 if not self.validate_nemi_table():
                     QMessageBox.warning(self, "Invalid Input", "Please correct the invalid inputs in the NEMI table.")
                     return
