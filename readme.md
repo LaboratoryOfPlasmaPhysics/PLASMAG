@@ -9,6 +9,7 @@ At its core, PLASMAG serves as a comprehensive tool for the parameters adjustmen
 Currently, PLASMAG is tailored to support search coil type instruments.
 However, its architecture is built with flexibility and extensibility in mind. This means PLASMAG is not only limited to current implementations but is also designed to easily accommodate the addition of new instruments and the integration of diverse calculation methods and models. 
 
+Online documentation can be found [here](https://plasmag.readthedocs.io/en/master/)
 
 ## Table of Contents
 
@@ -100,14 +101,15 @@ python PLASMAG.py
 3. Modularity and Flexibility:
 
 - Strategy Design Pattern: Implements a modular engine design using the strategy pattern, allowing dynamic changes in computation methods and easy adaptation to new requirements.
-- Parallel Computation: Supports parallelization of computations for improved efficiency.
+- Parallel Computation: Supports parallelization of computations for improved efficiency, to be implemented for futures improvements.
 - Graph Visualization Tools: Provides full graph visualization to monitor computation dependencies and processes.
 
 4. Export and Import Capabilities:
 
 - Export Data: Allows exporting of any product or parameter for plotting or later re-importation.
+- NEMI/CLTF Export: Exports the NEMI and Closed Loop Transfer Function (CLTF) graphs for easy design sharing.
 
-5. Optimization Module (Work in Progress):
+5. Optimization Module (WIP):
 
 - Genetic Optimization (DEAP): Utilizes evolutionary algorithms to find optimal parameter sets.
 - Particle Swarm Optimization: Implements swarm intelligence techniques to explore solution spaces.
@@ -115,6 +117,9 @@ python PLASMAG.py
 - Mono-parameter and Multi-parameter Optimization: Supports optimization for single and multiple parameters.
 - Mono-criteria and Multi-criteria Optimization: Handles single and multiple criteria, combining them into a single framework using weighted polynomials.
 
+**Available Targets:**
+- Impedance (Resonance Frequency)
+- NEMI (WIP)
 
 ## Availables Models
 
@@ -134,6 +139,10 @@ At this juncture, analytically describing the 'capacitance' part of the system g
 increasingly difficult, leading to a slight deviation from expected behaviors. 
 This discrepancy underlines a current limitation of the model, spotlighting the 
 need for further refinement and development to enhance its accuracy.
+
+The model (combination of all calculation strategy) is composed of 2 parts:
+- ``data/JUICE.json`` : Contains the parameters of the JUICE search coil magnetometer, their values will be used for computations
+- ````
 
 ## Documentation
 
