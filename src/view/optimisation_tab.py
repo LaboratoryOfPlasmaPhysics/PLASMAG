@@ -67,7 +67,7 @@ class OptimisationTab(QWidget):
 
         self.target_combobox = QComboBox()
         self.target_combobox.addItem("Impedance")
-        self.target_combobox.addItem("NEMI")
+        self.target_combobox.addItem("NEMI(WIP)")
         self.target_combobox.currentIndexChanged.connect(self.update_target)
         self.target_layout.addWidget(self.target_combobox)
 
@@ -149,7 +149,7 @@ class OptimisationTab(QWidget):
         Update the target input based on the selected target.
         :return:
         """
-        if self.target_combobox.currentText() == "NEMI":
+        if self.target_combobox.currentText() == "NEMI(WIP)":
             self.target_value_input.setVisible(False)
             self.nemi_table.setVisible(True)
         else:
@@ -208,13 +208,6 @@ class OptimisationTab(QWidget):
                             item.setBackground(QColor(255, 0, 0))  # Set to red for invalid input
                             is_valid = False
 
-            if weight_sum != 1:
-                print("Weight sum is not equal to 1")
-                is_valid = False
-                for col in range(self.nemi_table.columnCount()):
-                    item = self.nemi_table.item(2, col)
-                    if item:
-                        item.setBackground(QColor(255, 0, 0))  # Highlight the weight row if sum is not 1
         finally:
             self.nemi_table.blockSignals(False)  # Unblock signals
 
@@ -223,7 +216,7 @@ class OptimisationTab(QWidget):
     def on_optimise_clicked(self):
         """Popup message box to confirm the optimisation."""
         try:
-            if self.target_combobox.currentText() == "NEMI":
+            if self.target_combobox.currentText() == "NEMI(WIP)":
                 if not self.validate_nemi_table():
                     QMessageBox.warning(self, "Invalid Input", "Please correct the invalid inputs in the NEMI table.")
                     return
@@ -366,6 +359,9 @@ class OptimisationTab(QWidget):
 
         result_dialog = QDialog(self)
         result_dialog.setWindowTitle("Optimisation Results")
+        # big size
+        result_dialog.resize(800, 600)
+
 
         layout = QVBoxLayout(result_dialog)
 
@@ -377,7 +373,6 @@ class OptimisationTab(QWidget):
             results_text += f"<li><b>{param}:</b> {formatted_value}</li>"
         results_text += "</ul>"
 
-        self.save_results(final_params, export_specific_path=False, reload_to_parameters=False)
 
         results_label = QLabel(results_text)
         results_label.setWordWrap(True)
@@ -388,7 +383,7 @@ class OptimisationTab(QWidget):
         layout.addWidget(save_button)
 
         save_button = QPushButton("Load to parameters")
-        save_button.clicked.connect(lambda: self.save_results(final_params, export_specific_path=False))
+        save_button.clicked.connect(lambda: self.save_results(final_params, export_specific_path=False, reload_to_parameters=True))
         layout.addWidget(save_button)
 
         result_dialog.setLayout(layout)
@@ -455,8 +450,7 @@ class OptimisationTab(QWidget):
             # Save the results to a file
             with open(path, 'w') as file:
                 json.dump(input_parameters_copy, file, indent=4)
-            if reload_to_parameters:
-                self.reload_on_gui()
+                self.reload_on_gui(input_parameters_copy)
 
         except FileNotFoundError:
             QMessageBox.warning(self, "Invalid File", "Please enter a valid file name.")
@@ -465,15 +459,17 @@ class OptimisationTab(QWidget):
             QMessageBox.critical(self, "Error", f"An error occurred while saving the results: {e}")
 
 
-    def reload_on_gui(self):
+    def reload_on_gui(self, data):
         """
         Reload the results to the input parameters.
         :return:
         """
         # Update the input parameters
-        self.gui.import_parameters_from_json(path=self.saved_path, need_filename=False)
+        print("Updating input parameters from:", self.saved_path)
+        self.gui.import_parameters_from_json(path=self.saved_path, need_filename=False, data=data)
+        print("Called function import_parameters_from_json with path:", self.saved_path, "and need_filename:", False)
         self.gui.tabs.setCurrentIndex(0)
-        print("saving json")
+
     def on_message_box_clicked(self, button):
         """Handle the message box button clicked event."""
         if button.text() == "&Yes":

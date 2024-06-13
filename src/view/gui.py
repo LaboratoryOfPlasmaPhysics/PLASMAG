@@ -870,7 +870,7 @@ class MainGUI(QMainWindow):
 
         self.tabs.addTab(self.param_tab, "Parameters")
         self.tabs.addTab(self.strategy_tab, "Strategy Selection")
-        self.tabs.addTab(self.spice_tab, "Spice Simulation")
+        #self.tabs.addTab(self.spice_tab, "Spice Simulation")
         self.tabs.addTab(self.optimisation_tab, "Optimisation")
         self.tabs.addTab(self.EMC_tab, "EMC")
 
@@ -1213,14 +1213,14 @@ class MainGUI(QMainWindow):
         except Exception as e:
             self.display_error(f"Error exporting parameters: {e}")
 
-    def import_parameters_from_json(self, need_filename=True, path=None):
+    def import_parameters_from_json(self, need_filename=True, path=None, data=None):
         """
         Imports input parameters from a JSON file.
         The user is prompted to select a file to import the parameters from.
         The imported parameters are then used to update the UI.
         :return:
         """
-        # Show an open file dialog to the user
+
         try:
             filename = None
             if need_filename:
@@ -1230,8 +1230,21 @@ class MainGUI(QMainWindow):
                     fileName = path
             if fileName:
                 # If a file is selected, load the parameters from that file
+                print(fileName)
+                # with os merge full path with file name
+
+                path = os.path.dirname(os.path.abspath(__file__))
+                # go back 2 times
+                path = os.path.dirname(path)
+                path = os.path.dirname(path)
+                full_path = os.path.join(path, fileName)
+
+
                 with open(fileName, 'r', encoding="utf-8") as json_file:
-                    self.input_parameters = json.load(json_file)
+                    if data is None:
+                        self.input_parameters = json.load(json_file)
+                    else:
+                        self.input_parameters = data
                     self.reset_parameters(reload=False)  # Update the UI with the imported parameters
                 print(f"Parameters imported from {fileName}")
         except Exception as e:
