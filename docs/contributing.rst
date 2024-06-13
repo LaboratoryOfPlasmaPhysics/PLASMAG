@@ -30,6 +30,21 @@ Contributing
 
 -  `SPICE <#SPICE>`__
 
+Two cases are possible when you want to contribute to the project:
+- You want to add a new calculation strategy and increment the actual model, or
+you want to add a new strategy to a Node of the actual model. See `Add a New Strategy <#How-to-add-a-new-calculation-strategy>`__ for more information.
+
+- You want to start a brand new model, that differs highly from the actual model but keep using PLASMAG's architecture
+see `New model <#New-model>`__ for more information.
+
+
+Documentation
+-------------
+
+DO NOT forget to update the documentation in ``PLASMAG/doccs/ for your module``.
+Also recompile the documentation on readthedocs if you pushed your changes to Master.
+
+
 How to add a new calculation strategy
 -------------------------------------
 
@@ -38,7 +53,8 @@ Preliminary Checks
 
 1. Review Existing Strategies: Inspect all the calculation strategies in
    the calculation_strategies folder to ensure your strategy hasn’t
-   already been implemented.
+   already been implemented. All the strategies are located in the
+   ``src/model/strategies/strategy_lib/`` folder.
 2. Review Parameters: Examine the parameters defined in
    ``/data/default.json``. Determine if new parameters are needed for
    your strategy.
@@ -55,19 +71,31 @@ Adding New Parameters
 Strategy Implementation
 -----------------------
 
-4. Utilize Existing Nodes: Explore the list of nodes in
+4. Utilize Existing Nodes: Explore the list of nodes in the actual model STRATEGY_MAP used in
    ``src/controller/controller.py``\ to understand the available
    calculation strategies. Avoid recalculating nodes.
+The strategy map can be found in the ``src/controler/models/JUICE.py`` file.
 
 .. code:: python
 
-   self.engine.add_or_update_node('frequency_vector', FrequencyVectorStrategy())
-   self.engine.add_or_update_node('resistance', AnalyticalResistanceStrategy())
-   self.engine.add_or_update_node('Nz', AnalyticalNzStrategy())
+   STRATEGY_MAP = {
+    "resistance": {
+        "default": AnalyticalResistanceStrategy,
+        "strategies": [AnalyticalResistanceStrategy, AnalyticalResistanceStrategyv2]
+    },
+    "frequency_vector": {
+        "default": FrequencyVectorStrategy,
+        "strategies": [FrequencyVectorStrategy]
+    },
+    "Nz": {
+        "default": AnalyticalNzStrategy,
+        "strategies": [AnalyticalNzStrategy]
+    },
    ...
 
 DO NOT recalculate the same node with a different strategy. Instead,
-apply your new strategy to an existing node.
+apply your new strategy to an existing node. Simply by adding it to the
+"strategies" list of the node in the STRATEGY_MAP. Or replacing the "default" strategy by your new strategy.
 
 5. If your calculation strategy is not implemented, create a new file in
    the ``src/model/strategies/strategy_lib/`` folder with the name of
@@ -82,8 +110,12 @@ method.
 
 .. code:: python
 
+from src.model.strategies.strategy_lib.YOUR_MODULE import YOUR_STRATEGY
 
-   self.engine.add_or_update_node('node_name', YourStrategy())
+   "NODE_NAME": {
+        "default": YOUR_STRATEGY,
+        "strategies": [YOUR_STRATEGY]
+    },
 
 Method Specifications
 ---------------------
@@ -93,7 +125,8 @@ Dependencies
 
 -  The get_dependencies method must return a list of required parameters
    or nodes as strings, matching their names in the default.json file or
-   controller. ### Calculate method The ``calculate`` method must return
+   controller.
+- ``The ``calculate`` method must return
    the result of the calculation. The method takes two arguments:
 -  ``dependencies``: A dictionary containing the values of all the nodes
    available in the engine. The keys are the names of the nodes, and the
@@ -158,7 +191,7 @@ How to add a new parameter
 
 1. **Existing Parameters:** Verify if the new parameter exists within
    /data/default.json.
-2. **Addition:** Introduce new parameters to ``default.json`` as needed,
+2. **Addition:** Introduce new parameters to ``default.json`` or ``your_config.json``as needed,
    adhering to the specified format: The file must be in the following
    format:
 
@@ -329,11 +362,11 @@ How to add a new SPICE model
 1. Prepare the JSON Configuration for the SPICE Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Each SPICE module is defined in a JSON file, which outlines the circuit
+Each SPICE module is defined in a JSON file ``/data/SPICE.json``, which outlines the circuit
 characteristics along with associated parameters and calculation
 strategies. Here are the steps to prepare this file:
 
-1. **Module Key Creation:** Add a new key in the JSON file (e.g.,
+1. **Module Key Creation:** Add a new key/circuit in the JSON file (e.g.,
    **spice_new_model**) that will act as a unique identifier for the new
    module.
 
@@ -343,7 +376,8 @@ strategies. Here are the steps to prepare this file:
    -  **description:** A detailed description of the module, used for
       the user interface.
    -  **image:** The filename of the image representing the circuit
-      (must be pre-added to the relevant images directory).
+      (must be pre-added to the relevant images directory) ``/ressources/``.
+
 
 3. **Parameters:** Define all necessary parameters for the module. Each
    parameter should include:
@@ -354,12 +388,37 @@ strategies. Here are the steps to prepare this file:
    -  **input_unit and target_unit:** Input and conversion units, if
       applicable.
 
+.. code:: json
+
+    "R1": {
+            "default": 1000,
+            "min": 1,
+            "max": 10000,
+            "description": "Spice resistance connected to pre amp",
+            "input_unit": "",
+            "target_unit": ""
+        }
+
 4. **Strategies:**
 
    -  Add references to specific calculation strategies used by this
       module in the ``src/model/strategies/strategy_lib/`` directory.
    -  Each strategy must have a **name** and a **file** pointing to the
       Python script implementing the strategy.
+
+.. code:: json
+
+    "strategies" : {
+        "SPICE_impedance" : {
+          "name" : "SPICE impedance",
+          "file" : "src/model/strategies/strategy_lib/SPICE.py"
+        },
+        "SPICE_op_Amp_transcient" : {
+          "name" : "SPICE op Amp transcient",
+          "file" : "src/model/strategies/strategy_lib/SPICE.py"
+        },
+        ....
+
 
 Example JSON Section for a New SPICE Module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -442,3 +501,10 @@ the repository:
    linear Gain, and the phase in radians. The first column should be the
    frequency values, the second column the gain, and the third column
    the phase, with the following labels : “Frequency”, “Gain”, “Phase”
+
+
+
+New model
+---------
+
+TODO
