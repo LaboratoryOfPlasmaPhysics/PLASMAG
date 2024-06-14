@@ -32,7 +32,7 @@ from qtrangeslider import QRangeSlider
 from src.controler.controller import CalculationController, STRATEGY_MAP
 
 from src.model.visualisation.create_tree import create_tree, add_title_description
-from view.optimisation_tab import OptimisationTab
+from src.view.optimisation_tab import OptimisationTab
 
 ureg: UnitRegistry = UnitRegistry()
 
