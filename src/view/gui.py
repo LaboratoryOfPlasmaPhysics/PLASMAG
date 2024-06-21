@@ -21,7 +21,7 @@ from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal, QPoint, QEvent, QUrl
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QPushButton, QLabel, \
     QGridLayout, QSlider, QCheckBox, QHBoxLayout, QSpacerItem, QSizePolicy, QComboBox, QScrollArea, QFileDialog, \
     QMessageBox, QInputDialog, QTabWidget, QToolTip, QGroupBox, QSplitter, QDialog, QProgressDialog
-from PyQt6.QtGui import QPixmap, QDesktopServices
+from PyQt6.QtGui import QPixmap, QDesktopServices, QIcon
 from PyQt6.QtWidgets import QSplashScreen, QApplication
 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -298,6 +298,13 @@ class MainGUI(QMainWindow):
 
         self.setWindowTitle("PLASMAG")
         self.setGeometry(100, 100, 2560, 1440)  # Adjust size as needed
+
+        # set icon
+        self.setWindowIcon(QIcon("ressources" + os.sep + "logo.png"))
+
+        #set process logo
+        self.splash = QSplashScreen(QPixmap("ressources" + os.sep + "logo.png"))
+        self.splash.show()
 
         self.load_default_parameters()
         self.load_spice_configs()

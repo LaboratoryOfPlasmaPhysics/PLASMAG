@@ -284,10 +284,11 @@ create a new branch following these conventions:
 
 -  **Feature Branches**: ``engine/branch-name``, ``UI/branch-name``,
    ``controller/branch-name``
+- **Module Branches**: ``SPICE/branch-name``, ``OPTI/branch-name``
 -  **Refactoring**: ``refactor/branch-name``
 
-**Important**: Direct commits to the ``dev`` branch are prohibited.
-Always create a new branch for your work, branching off from the latest
+**Important**: Direct commits to the ``dev`` branch are not recommended.
+Try to create a new branch for your work, branching off from the latest
 ``dev`` branch.
 
 Commit Message Format
@@ -342,6 +343,9 @@ Best Practices for Pull Requests
 By following these guidelines, you contribute to the efficiency and
 clarity of the project, making it easier for others to review your
 contributions and maintain the project’s health.
+
+After completing your work, open a pull request from your branch to the
+``dev`` branch.
 
 SPICE
 -----
