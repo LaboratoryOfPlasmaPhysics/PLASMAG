@@ -1,4 +1,5 @@
 import json
+import os
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QProgressDialog, QGroupBox, \
     QComboBox, QLineEdit, QTableWidgetItem, QTableWidget, QDialog, QFileDialog
@@ -401,8 +402,17 @@ class OptimisationTab(QWidget):
         """
         try :
             if not export_specific_path:
+                # check if /output folder exist
+
+                # if not create it
+                try:
+                    os.makedirs("output")
+                except FileExistsError:
+                    pass
+
                 # default path output/temp.json
                 path = "output/temp.json"
+
             else :
                 path, _ = QFileDialog.getSaveFileName(self, "Export Optimisation data", "", "json Files (*.png)")
 
