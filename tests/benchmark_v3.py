@@ -34,7 +34,7 @@ parameters_dict = {
     # Add other parameters required by the strategies
     'mu_insulator': 1,
     'len_coil': 155 * 10 ** -3,
-    'kapthon_thick': 30 * 10 ** -6,
+    'kapton_thick': 30 * 10 ** -6,
     'insulator_thick': 10 * 10 ** -6,
     'diam_out_mandrel': 3.2 * 10 ** -3,
     'diam_wire': 90 * 10 ** -6,

@@ -9,7 +9,7 @@ class AnalyticalCapacitanceStrategy(CalculationStrategy):
     def calculate(self, dependencies: dict, parameters: InputParameters):
         mu_insulator = parameters.data['mu_insulator']
         len_coil = parameters.data['len_coil']
-        kapthon_thick = parameters.data['kapthon_thick']
+        kapton_thick = parameters.data['kapton_thick']
         insulator_thick = parameters.data['insulator_thick']
         diam_out_mandrel = parameters.data['diam_out_mandrel']
         diam_wire = parameters.data['diam_wire']
@@ -25,9 +25,9 @@ class AnalyticalCapacitanceStrategy(CalculationStrategy):
 
         result = (
                 (np.pi * (mu_0 * 4 * np.pi * 10**-7) * mu_insulator * len_coil) /
-                ((kapthon_thick + 2 * insulator_thick) * nb_layer ** 2)
+                ((kapton_thick + 2 * insulator_thick) * nb_layer ** 2)
                 * ((nb_layer - 1) * diam_out_mandrel * 1 / 2 + nb_layer * (nb_layer - 1) * (
-                    diam_wire * kapthon_thick) / 2)
+                    diam_wire * kapton_thick) / 2)
                 + capa_tuning + capa_triwire
         )
 
@@ -39,5 +39,5 @@ class AnalyticalCapacitanceStrategy(CalculationStrategy):
 
     @staticmethod
     def get_dependencies():
-        return ['mu_insulator', 'len_coil', 'kapthon_thick', 'insulator_thick', 'diam_out_mandrel',
+        return ['mu_insulator', 'len_coil', 'kapton_thick', 'insulator_thick', 'diam_out_mandrel',
                 'diam_wire', 'capa_tuning', 'capa_triwire', 'coeff_expansion', 'nb_spire', 'mu_app']

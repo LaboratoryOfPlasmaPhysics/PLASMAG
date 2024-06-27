@@ -86,7 +86,7 @@ parameters_dict = {
     'f_stop': 1000000,
     'nb_points_per_decade': 1000,
     'mu_insulator': 1,
-    'kapthon_thick': 30e-6,
+    'kapton_thick': 30e-6,
     'insulator_thick': 10e-6,
     'diam_out_mandrel': 3.2e-3,
     'len_core': 20e-2,

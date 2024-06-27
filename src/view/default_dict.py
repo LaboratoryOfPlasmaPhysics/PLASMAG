@@ -5,9 +5,9 @@ input_parameters = {
         'description': "Permeability of the insulator",
         'input_unit': '', 'target_unit': ''
     },
-    'kapthon_thick': {
+    'kapton_thick': {
         'default': 30, 'min': 10, 'max': 300,
-        'description': "Thickness of the kapthon in micrometers",
+        'description': "Thickness of the kapton in micrometers",
         'input_unit': 'micrometer', 'target_unit': 'meter'
     },
     'insulator_thick': {
