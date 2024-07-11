@@ -414,7 +414,7 @@ class OptimisationTab(QWidget):
                 path = "output/temp.json"
 
             else :
-                path, _ = QFileDialog.getSaveFileName(self, "Export Optimisation data", "", "json Files (*.png)")
+                path, _ = QFileDialog.getSaveFileName(self, "Export Optimisation data", "", "json Files (*.json)")
 
             if not path:
                 return
