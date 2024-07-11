@@ -249,55 +249,5 @@
             "target_unit": ""
         }
     },
-    "SPICE": {
-        "R1": {
-            "default": 1000.0,
-            "min": 1,
-            "max": 10000,
-            "description": "Spice resistance test",
-            "input_unit": "",
-            "target_unit": ""
-        },
-        "R2": {
-            "default": 2000.0,
-            "min": 1,
-            "max": 10000,
-            "description": "Spice resistance test",
-            "input_unit": "",
-            "target_unit": ""
-        },
-        "R3": {
-            "default": 3000.0,
-            "min": 1,
-            "max": 10000,
-            "description": "Spice resistance test",
-            "input_unit": "",
-            "target_unit": ""
-        },
-        "R4": {
-            "default": 4000.0,
-            "min": 1,
-            "max": 10000,
-            "description": "Spice resistance test",
-            "input_unit": "",
-            "target_unit": ""
-        },
-        "R5": {
-            "default": 5000.0,
-            "min": 1,
-            "max": 10000,
-            "description": "Spice resistance test",
-            "input_unit": "",
-            "target_unit": ""
-        },
-        "spice_resistance_test": {
-            "default": 1.0,
-            "min": 1,
-            "max": 10000,
-            "description": "Spice resistance test",
-            "input_unit": "",
-            "target_unit": ""
-        }
-    },
     "SPICE_circuit": "NO Circuit Selected"
 }
