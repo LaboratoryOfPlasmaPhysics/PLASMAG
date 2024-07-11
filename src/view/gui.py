@@ -991,6 +991,19 @@ class MainGUI(QMainWindow):
                file_path (str): The path to the HTML file to open.
            """
         print("Displaying graph : " + clustering_type)
+
+        try:
+            os.makedirs("output")
+        except FileExistsError:
+            pass
+
+        # try to make /output/visualisation_graph/
+
+        try:
+            os.makedirs("output/visualisation_graph")
+        except FileExistsError:
+            pass
+
         path = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/output/visualisation_graph/"
         date = datetime.now().strftime("%Y-%m-%d_%Hh%Mm%Ss")
 
