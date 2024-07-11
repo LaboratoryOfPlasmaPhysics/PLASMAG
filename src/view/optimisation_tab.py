@@ -56,8 +56,8 @@ class OptimisationTab(QWidget):
 
         # Combobox for method selection
         self.method_combobox = QComboBox()
-        self.method_combobox.addItem("Genetic Optimization")
-        self.method_combobox.addItem("Particle Swarm Optimization")
+        self.method_combobox.addItem("Genetic optimisation")
+        self.method_combobox.addItem("Particle Swarm optimisation")
         self.method_combobox.addItem("Simulated Annealing")
         self.method_combobox.currentIndexChanged.connect(self.update_hyperparameters)  # Connect the combobox change event
         self.layout.addWidget(self.method_combobox)
@@ -117,11 +117,11 @@ class OptimisationTab(QWidget):
             self.hyperparameters_layout.itemAt(i).widget().deleteLater()
 
         method = self.method_combobox.currentText()
-        if method == "Genetic Optimization":
+        if method == "Genetic optimisation":
             self.add_hyperparameter_field("Number of Generations", "20")
             self.add_hyperparameter_field("Population Size", "100")
             self.add_hyperparameter_field("Mutation Rate", "0.3")
-        elif method == "Particle Swarm Optimization":
+        elif method == "Particle Swarm optimisation":
             self.add_hyperparameter_field("w1", "0.5")
             self.add_hyperparameter_field("c1", "1.0")
             self.add_hyperparameter_field("c2", "1.0")
@@ -225,9 +225,9 @@ class OptimisationTab(QWidget):
             else:
                 target_value = float(self.target_value_input.text())
                 # Update target resonance frequency based on the selected method
-                if self.method_combobox.currentText() == "Genetic Optimization":
+                if self.method_combobox.currentText() == "Genetic optimisation":
                     self.optimisation.update_target_resonance_freq(target_value)
-                elif self.method_combobox.currentText() == "Particle Swarm Optimization":
+                elif self.method_combobox.currentText() == "Particle Swarm optimisation":
                     self.pso_optimisation.update_target_resonance_freq(target_value)
                 elif self.method_combobox.currentText() == "Simulated Annealing":
                     self.sa_optimisation.update_target_resonance_freq(target_value)
@@ -282,12 +282,12 @@ class OptimisationTab(QWidget):
 
             hyperparameters = self.get_hyperparameters()
 
-            if self.method_combobox.currentText() == "Genetic Optimization":
+            if self.method_combobox.currentText() == "Genetic optimisation":
                 self.optimisation.generations = int(hyperparameters["Number of Generations"])
                 self.optimisation.population_size = int(hyperparameters["Population Size"])
                 self.optimisation.mutation_rate = float(hyperparameters["Mutation Rate"])
                 total_iterations = self.optimisation.generations
-            elif self.method_combobox.currentText() == "Particle Swarm Optimization":
+            elif self.method_combobox.currentText() == "Particle Swarm optimisation":
                 self.pso_optimisation.w1 = float(hyperparameters["w1"])
                 self.pso_optimisation.c1 = float(hyperparameters["c1"])
                 self.pso_optimisation.c2 = float(hyperparameters["c2"])
@@ -304,14 +304,14 @@ class OptimisationTab(QWidget):
             self.progress_dialog.setModal(True)
             self.progress_dialog.show()
 
-            if self.method_combobox.currentText() == "Genetic Optimization":
+            if self.method_combobox.currentText() == "Genetic optimisation":
                 self.optimisation.start()  # Ensure GeneticOptimisation runs in a thread
-            elif self.method_combobox.currentText() == "Particle Swarm Optimization":
+            elif self.method_combobox.currentText() == "Particle Swarm optimisation":
                 self.pso_optimisation.start()  # Ensure PSO runs in a thread
             elif self.method_combobox.currentText() == "Simulated Annealing":
                 self.sa_optimisation.start()  # Ensure Simulated Annealing runs in a thread
         else:
-            print("Optimization canceled!")
+            print("optimisation canceled!")
 
     def get_hyperparameters(self):
         """
@@ -337,9 +337,9 @@ class OptimisationTab(QWidget):
             self.progress_dialog.setValue(generation)
             self.ax.plot(generation, best_fitness, 'ro-')  # Plot each point as it comes in
             self.canvas.draw()  # Update the canvas
-            if self.method_combobox.currentText() == "Genetic Optimization":
+            if self.method_combobox.currentText() == "Genetic optimisation":
                 total_generations = self.optimisation.generations
-            elif self.method_combobox.currentText() == "Particle Swarm Optimization":
+            elif self.method_combobox.currentText() == "Particle Swarm optimisation":
                 total_generations = self.pso_optimisation.n_iterations
             elif self.method_combobox.currentText() == "Simulated Annealing":
                 total_generations = self.sa_optimisation.n_iterations
@@ -366,7 +366,7 @@ class OptimisationTab(QWidget):
 
         layout = QVBoxLayout(result_dialog)
 
-        results_text = f"<h2>Optimization Completed!</h2>"
+        results_text = f"<h2>optimisation Completed!</h2>"
         results_text += f"<p><b>Final Resonance Frequency:</b> {final_resonance_freq:.2f}</p>"
         results_text += "<p><b>Final Parameters:</b></p><ul>"
         for param, value in final_params.items():
