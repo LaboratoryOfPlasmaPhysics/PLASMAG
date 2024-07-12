@@ -8,8 +8,6 @@ import importlib
 import json
 import os
 import sys
-import time
-import warnings
 import webbrowser
 from datetime import datetime
 
@@ -17,20 +15,42 @@ from pint import UnitRegistry
 import numpy as np
 import pandas as pd
 
-from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal, QPoint, QEvent, QUrl
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QPushButton, QLabel, \
-    QGridLayout, QSlider, QCheckBox, QHBoxLayout, QSpacerItem, QSizePolicy, QComboBox, QScrollArea, QFileDialog, \
-    QMessageBox, QInputDialog, QTabWidget, QToolTip, QGroupBox, QSplitter, QDialog, QProgressDialog
+from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal, QEvent, QUrl
+from PyQt6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QVBoxLayout,
+    QWidget,
+    QLineEdit,
+    QPushButton,
+    QLabel,
+    QGridLayout,
+    QSlider,
+    QCheckBox,
+    QHBoxLayout,
+    QSpacerItem,
+    QSizePolicy,
+    QComboBox,
+    QScrollArea,
+    QFileDialog,
+    QMessageBox,
+    QInputDialog,
+    QTabWidget,
+    QGroupBox,
+    QSplitter,
+    QDialog,
+    QProgressDialog,
+    QSplashScreen,
+)
 from PyQt6.QtGui import QPixmap, QDesktopServices, QIcon
-from PyQt6.QtWidgets import QSplashScreen, QApplication
 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from qtrangeslider import QRangeSlider
-from src.controler.controller import CalculationController, STRATEGY_MAP
 
+from src.controler.controller import CalculationController, STRATEGY_MAP
 from src.model.visualisation.create_tree import create_tree, add_title_description
 from src.view.optimisation_tab import OptimisationTab
 
@@ -176,16 +196,8 @@ class ToolTipLineEdit(QLineEdit):
         self.defaultValue = default_value
         self.tooltip_text = tooltip_text
         self.setText(self.defaultValue)
-        self.textChanged.connect(self.showToolTip)
-        self.focusInEvent = self.showCustomToolTip
         self.setPlaceholderText(f"Default: {default_value}")
-
-    def showCustomToolTip(self, event):
-        super().focusInEvent(event)
-        self.showToolTip()
-
-    def showToolTip(self):
-        QToolTip.showText(self.mapToGlobal(QPoint(0, 0)), self.tooltip_text, self)
+        self.setToolTip(self.tooltip_text)
 
 
 class CalculationThread(QThread):
