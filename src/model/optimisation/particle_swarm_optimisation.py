@@ -137,7 +137,7 @@ if __name__ == "__main__":
         'len_core': 20e-2,
         'diam_core': 3.2e-3,
         'mu_r': 100000,
-        'rho_whire': 1.6,
+        'rho_wire': 1.6,
         'coeff_expansion': 1,
         'stage_1_cutting_freq': 20000,
         'stage_2_cutting_freq': 20000,

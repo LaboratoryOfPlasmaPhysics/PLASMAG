@@ -54,7 +54,7 @@ input_parameters = {
         'description': "Radius of the spire in millimeters",
         'input_unit': 'millimeter', 'target_unit': 'meter'
     },
-    'rho_whire': {
+    'rho_wire': {
         'default': 1.6, 'min': 1, 'max': 10,
         'description': "Resistivity of the wire",
         'input_unit': '', 'target_unit': ''

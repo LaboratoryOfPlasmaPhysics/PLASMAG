@@ -52,7 +52,7 @@ if __name__ == "__main__":
         'mu_r': 100000,
         'nb_spire': 10000,
         'ray_spire': 5 * 10 ** -3,
-        'rho_whire': 1.6,
+        'rho_wire': 1.6,
         'coeff_expansion': 1,
         'stage_1_cutting_freq': 20000,
         'stage_2_cutting_freq': 20000,
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         parameters_dict['len_coil'],  # Initial length of coil
         parameters_dict['diam_wire'],  # Initial diameter of wire
         parameters_dict['nb_spire'],  # Initial number of spires
-        parameters_dict['rho_whire'],
+        parameters_dict['rho_wire'],
         parameters_dict['diam_core'],
         parameters_dict['len_core'],
         parameters_dict['mu_r'],
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         (1e-3, 200e-3),  # Bounds for len_coil
         (10e-6, 300e-6),  # Bounds for diam_wire
         (1000, 20000),  # Bounds for nb_spire
-        (1,10), # Bounds for rho_whire
+        (1,10), # Bounds for rho_wire
         (1e-3, 100e-3), # Bounds for diam_core
         (1e-2, 200e-2), # Bounds for len_core
         (1, 1000000), # Bounds for mu_r
@@ -157,11 +157,3 @@ if __name__ == "__main__":
     impedance = results['impedance']["data"]
     final_resonance_freq = determine_resonance_freq(impedance[:, 0], impedance[:, 1])
     print("Final resonance frequency: ", final_resonance_freq)
-
-
-
-
-
-
-
-

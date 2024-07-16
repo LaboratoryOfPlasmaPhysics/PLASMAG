@@ -5,7 +5,7 @@ class AnalyticalResistanceStrategy(CalculationStrategy):
     def calculate(self, dependencies: dict, parameters: InputParameters):
         N = parameters.data['nb_spire']
         Rs = parameters.data['ray_spire']
-        rho = parameters.data['rho_whire']
+        rho = parameters.data['rho_wire']
         value = N * (2 * np.pi * Rs) * rho
 
         return {
@@ -16,13 +16,13 @@ class AnalyticalResistanceStrategy(CalculationStrategy):
 
     @staticmethod
     def get_dependencies():
-        return ['nb_spire', 'ray_spire', 'rho_whire']
+        return ['nb_spire', 'ray_spire', 'rho_wire']
 
 class AnalyticalResistanceStrategyv2(CalculationStrategy):
     def calculate(self, dependencies: dict, parameters: InputParameters):
         N = parameters.data['nb_spire']
         Rs = parameters.data['ray_spire']
-        rho = parameters.data['rho_whire']
+        rho = parameters.data['rho_wire']
         value = N * (2 * np.pi * Rs) * rho
 
         return {
@@ -33,7 +33,4 @@ class AnalyticalResistanceStrategyv2(CalculationStrategy):
 
     @staticmethod
     def get_dependencies():
-        return ['nb_spire', 'ray_spire', 'rho_whire', "resistance"]
-
-
-
+        return ['nb_spire', 'ray_spire', 'rho_wire', "resistance"]
