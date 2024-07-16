@@ -289,6 +289,8 @@ class MainGUI(QMainWindow):
         self.controller = None
         self.calculation_timer = None
         self.input_parameters = None
+        self.default_parameters = None
+        self.default_spice_circuit = None
         self.frequency_values_label = None
         self.frequency_range_slider = None
         self.global_slider_fine = None
@@ -307,6 +309,8 @@ class MainGUI(QMainWindow):
         self.saved_spice_strategies = []
         self.saved_spice_parameters = []
         self.first_run = True
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.data_path = os.path.join(current_dir, '..', '..', 'data')
 
         self.setWindowTitle("PLASMAG")
         self.setGeometry(100, 100, 2560, 1440)  # Adjust size as needed
@@ -345,8 +349,7 @@ class MainGUI(QMainWindow):
 
     def load_spice_configs(self):
         try:
-            current_dir = os.path.dirname(os.path.realpath(__file__))
-            spice_config_path = os.path.join(current_dir, '..', '..', 'data', 'SPICE.json')
+            spice_config_path = os.path.join(self.data_path, 'SPICE.json')
             spice_config_path = os.path.normpath(spice_config_path)
             with open(spice_config_path, 'r', encoding='utf-8') as file:
                 self.spice_configs = json.load(file)['Circuits']
@@ -465,9 +468,9 @@ class MainGUI(QMainWindow):
         if reload:
             current_dir = os.path.dirname(os.path.realpath(__file__))
             if "default_file" in self.config_dict:
-                json_file_path = os.path.join(current_dir, '..', '..', 'data', self.config_dict["default_file"])
+                json_file_path = os.path.join(self.data_path, self.config_dict["default_file"])
             else:
-                json_file_path = os.path.join(current_dir, '..', '..', 'data', 'default.json')
+                json_file_path = os.path.join(self.data_path, 'default.json')
             json_file_path = os.path.normpath(json_file_path)
 
             print("Loading default parameters from: ", json_file_path)
@@ -475,31 +478,23 @@ class MainGUI(QMainWindow):
             try:
                 with open(json_file_path, 'r', encoding="utf-8") as json_file:
                     self.input_parameters = json.load(json_file)
-
-                    try :
-                        self.default_spice_circuit = self.input_parameters['SPICE_circuit']
-                    except KeyError:
-                        self.default_spice_circuit = "NO Circuit Selected"
-
-                    # Remove the SPICE_circuit key from the input parameters
-                    self.input_parameters.pop('SPICE_circuit', None)
+                    self.default_parameters = self.input_parameters.copy()
             except FileNotFoundError:
-                print(f"File{json_file_path} not found.")
+                print(f"File {json_file_path} not found.")
             except json.JSONDecodeError:
-                print(f"Error reading : {json_file_path}.")
-        else:
-            self.input_parameters = self.input_parameters
+                print(f"Error reading: {json_file_path}.")
+
+        try:
             self.default_spice_circuit = self.input_parameters['SPICE_circuit']
+        except KeyError:
+            self.default_spice_circuit = "NO Circuit Selected"
 
-            # Remove the SPICE_circuit key from the input parameters
-            self.input_parameters.pop('SPICE_circuit', None)
-
-            #get the index of the default circuit in the combobox
+        # Remove the SPICE_circuit key from the input parameters
+        self.input_parameters.pop('SPICE_circuit', None)
+        if hasattr(self, "spice_circuit_combo"):
+            # get the index of the default circuit in the combobox
             index = self.spice_circuit_combo.findText(self.default_spice_circuit)
             self.spice_circuit_combo.setCurrentIndex(index)
-
-
-
 
     def init_timer(self, timer_value=50):
         """
@@ -1268,9 +1263,7 @@ class MainGUI(QMainWindow):
                 path = os.path.dirname(os.path.abspath(__file__))
                 # go back 2 times
                 path = os.path.dirname(path)
-                path = os.path.dirname(path)
                 full_path = os.path.join(path, fileName)
-
 
                 with open(fileName, 'r', encoding="utf-8") as json_file:
                     if data is None:
@@ -1441,33 +1434,54 @@ class MainGUI(QMainWindow):
             print(f"Error updating input value: {e}")
 
     def retrieve_parameters(self):
-        params_dict = {}
+        params_dict = dict()
+        # get f_start and f_stop values
+        params_dict["f_start"] = getattr(self, "f_start_value")
+        params_dict["f_stop"] = getattr(self, "f_stop_value")
 
-        for category, parameters in self.input_parameters.items():
-            for param, attrs in parameters.items():
-                if param in ['f_start', 'f_stop']:
-                    params_dict[param] = getattr(self, f"{param}_value")
-                    continue
+        # walk through the other parameters of the GUI
+        for param, line_edit in self.inputs.items():
+            # search for *param* in user JSON file
+            attrs = {}
+            for category, parameters in self.input_parameters.items():
+                if param in parameters:
+                    attrs = parameters[param]
+                    break
 
-                if param in self.inputs:
-                    try:
-                        text = self.inputs[param].text()
-                    except RuntimeError as e:
-                        print(param, e)
-                        print(f"Error retrieving input value: {e}")
-                        continue
-                    try:
-                        value = float(text)
-                        input_unit = attrs.get('input_unit', '')
-                        target_unit = attrs.get('target_unit', '')
-                        if input_unit and target_unit:
-                            value_converted = convert_unit(value, input_unit, target_unit)
-                        else:
-                            value_converted = value
-                        params_dict[param] = value_converted
-                    except ValueError:
-                        print(f"Invalid input for parameter '{param}': '{text}'. Skipping calculation.")
-                        return None
+            # if *param* not found, search for it in default parameters
+            if not attrs:
+                for category, parameters in self.default_parameters.items():
+                    if param in parameters:
+                        attrs = parameters[param]
+                        break
+
+            # if *param* still not found: print error message and quit
+            if not attrs:
+                print(f"Parameter {param} found neither in default.json nor in user JSON file")
+                print(f"default {self.default_parameters}\n")
+                print(f"input {self.input_parameters}\n")
+                return None
+
+            # get the line edit value
+            try:
+                text = line_edit.text()
+            except RuntimeError as e:
+                print(f"Error retrieving input value: {e}")
+                continue
+
+            # convert *text* into numerical value and apply unit conversion
+            try:
+                value = float(text)
+                input_unit = attrs.get('input_unit', '')
+                target_unit = attrs.get('target_unit', '')
+                if input_unit and target_unit:
+                    value_converted = convert_unit(value, input_unit, target_unit)
+                else:
+                    value_converted = value
+                params_dict[param] = value_converted
+            except ValueError:
+                print(f"Invalid input for parameter '{param}': '{text}'. Skipping calculation.")
+                return None
 
         return params_dict
 
