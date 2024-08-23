@@ -1753,32 +1753,9 @@ class MainGUI(QMainWindow):
         print(type(strategy_class))
         print(f"Gui - try to update strategy for {node_name} to {strategy_class.__name__}")
 
-        params_dict = {}
-        for category, parameters in self.input_parameters.items():
-            for param, attrs in parameters.items():
-                if param in ['f_start', 'f_stop']:
-                    params_dict[param] = getattr(self, f"{param}_value")
-                    continue
+        params_dict = self.retrieve_parameters()
 
-                if param in self.inputs:
-                    try:
-                        text = self.inputs[param].text()
-                    except RuntimeError:
-                        pass
-                    try:
-                        value = float(text)
-                        input_unit = attrs.get('input_unit', '')
-                        target_unit = attrs.get('target_unit', '')
-                        if input_unit and target_unit:
-                            value_converted = convert_unit(value, input_unit, target_unit)
-                        else:
-                            value_converted = value
-                        params_dict[param] = value_converted
-                    except ValueError:
-                        print(f"Invalid input for parameter '{param}': '{text}'. Skipping calculation.")
-                        return
-
-        try :
+        try:
             self.controller.set_node_strategy(node_name, strategy_class, params_dict)
         except Exception as e:
             self.display_error(f"Error updating strategy for {node_name}: {e}")
