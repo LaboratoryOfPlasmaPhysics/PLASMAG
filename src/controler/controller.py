@@ -2,11 +2,8 @@
  src/controller/controller.py
  PLASMAG 2024 Software, LPP
 """
-import importlib
-import json
-
 import numpy as np
-from src.controler.models.JUICE import STRATEGY_MAP
+from src.controler.models.scm_model import STRATEGY_MAP
 from src.model.input_parameters import InputParameters
 from src.model.engine import CalculationEngine
 
@@ -52,11 +49,11 @@ class CalculationController:
         if self.params:
             self.update_parameters(self.params)
 
-
     def delete_spice_nodes(self, spice_nodes : list):
         for node_name in spice_nodes:
             self.engine.delete_node(node_name)
             print(f"Deleted node {node_name}")
+
     def update_parameters(self, params_dict):
         """
                Updates the input parameters of the calculation engine using the provided dictionary. This method
@@ -134,7 +131,7 @@ class CalculationController:
 
     def set_node_strategy(self, node_name, strategy_class, params_dict):
         strategy_instance = strategy_class()
-        print(strategy_instance)
+        # print(strategy_instance)
         self.engine.swap_strategy_for_node(node_name, strategy_instance, params_dict)
 
     def export_CLTF_NEMI(self, path):
@@ -200,4 +197,3 @@ class CalculationController:
             return "SUCCESS"
         except Exception as e:
             return "ERROR Plotting data : " + str(e)
-
