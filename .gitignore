@@ -4,7 +4,8 @@
 /output/*
 
 .idea/
-/__pycache__/
+__pycache__/
 /Legacy_code/
+.DS_Store
 
 /src/model/strategies/test_strategy/random_strategy_tests.py
