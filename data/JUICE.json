@@ -4,9 +4,17 @@
             "default": 1.0,
             "min": 0,
             "max": 10,
-            "description": "Permeability of the insulator",
-            "input_unit": "",
-            "target_unit": ""
+            "description": "Relative permeability of the insulator",
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
+        },
+        "mu_r": {
+            "default": 100000.0,
+            "min": 1,
+            "max": 1000000,
+            "description": "Relative permeability of the core",
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "kapton_thick": {
             "default": 30.0,
@@ -50,14 +58,6 @@
         }
     },
     "COIL": {
-        "mu_r": {
-            "default": 100000.0,
-            "min": 1,
-            "max": 1000000,
-            "description": "Relative permeability",
-            "input_unit": "",
-            "target_unit": ""
-        },
         "len_coil": {
             "default": 155.0,
             "min": 1,
@@ -71,8 +71,8 @@
             "min": 1000,
             "max": 20000,
             "description": "Number of spires",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "ray_spire": {
             "default": 4.098,
@@ -87,16 +87,16 @@
             "min": 1,
             "max": 10,
             "description": "Resistivity of the wire",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "ohm.meter",
+            "target_unit": "ohm.meter"
         },
         "coeff_expansion": {
             "default": 1.0,
             "min": 1,
             "max": 10,
             "description": "Expansion coefficient",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "diam_wire": {
             "default": 120.0,
@@ -145,16 +145,16 @@
             "min": 1,
             "max": 1000,
             "description": "Gain of the first stage in linear",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "gain_2_linear": {
             "default": 3.2,
             "min": 1,
             "max": 1000,
             "description": "Gain of the second stage in linear",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         }
     },
     "misc": {
@@ -163,8 +163,8 @@
             "min": 0,
             "max": 1,
             "description": "Mutual inductance",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "feedback_resistance": {
             "default": 150000.0,
@@ -195,16 +195,16 @@
             "min": 10,
             "max": 1000,
             "description": "Number of points per decade",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "temperature": {
             "default": 296.0,
             "min": 0,
             "max": 500,
             "description": "Temperature in Kelvin, used for Noise calculation",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "K",
+            "target_unit": "K"
         }
     },
     "flicker": {
@@ -213,42 +213,41 @@
             "min": 1,
             "max": 1000,
             "description": "Parameter A",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "Para_B": {
             "default": 34.0,
             "min": 1,
             "max": 100,
             "description": "Parameter B",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "Alpha": {
             "default": 7.0,
             "min": 1,
             "max": 100,
             "description": "Alpha",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
         },
         "e_en": {
             "default": 3.0,
             "min": 1,
             "max": 100,
             "description": "e_en",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "nV/(Hz**.5)",
+            "target_unit": "nV/(Hz**.5)"
         },
         "e_in": {
             "default": 106.0,
             "min": 1,
             "max": 10000,
             "description": "e_in",
-            "input_unit": "",
-            "target_unit": ""
+            "input_unit": "pA/(Hz**.5)",
+            "target_unit": "A/(Hz**.5)"
         }
     },
-        "SPICE_circuit": "NO Circuit Selected"
-
+    "SPICE_circuit": "NO Circuit Selected"
 }
