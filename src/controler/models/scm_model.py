@@ -16,7 +16,7 @@ from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrat
 from src.model.strategies.strategy_lib.inductance import AnalyticalInductanceStrategy
 from src.model.strategies.strategy_lib.lambda_strategy import AnalyticalLambdaStrategy
 from src.model.strategies.strategy_lib.mu_app import AnalyticalMu_appStrategy
-from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy
+from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy, MultiLayerResistanceStrategy
 from src.model.strategies.strategy_lib.SPICE import SPICE_test, SPICE_op_Amp_gain, SPICE_op_Amp_transcient, \
     SPICE_impedance
 
@@ -24,7 +24,7 @@ from src.model.strategies.strategy_lib.SPICE import SPICE_test, SPICE_op_Amp_gai
 STRATEGY_MAP = {
     "resistance": {
         "default": AnalyticalResistanceStrategy,
-        "strategies": [AnalyticalResistanceStrategy]
+        "strategies": [AnalyticalResistanceStrategy, MultiLayerResistanceStrategy]
     },
     "frequency_vector": {
         "default": FrequencyVectorStrategy,

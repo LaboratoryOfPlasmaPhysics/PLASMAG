@@ -74,6 +74,14 @@
             "input_unit": "dimensionless",
             "target_unit": "dimensionless"
         },
+        "nb_spire_feedback": {
+            "default": 144.0,
+            "min": 0,
+            "max": 20000,
+            "description": "Number of spires of the feedback coil",
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
+        },
         "ray_spire": {
             "default": 5.0,
             "min": 1,
