@@ -3,9 +3,17 @@ from src.model.input_parameters import InputParameters
 from src.model.strategies import CalculationStrategy
 
 
-class AnalyticalLambdaStrategy(CalculationStrategy):
-    """
-    TODo: Add description
+class LukoschusAnalyticalLambdaStrategy(CalculationStrategy):
+    """Lukoschus's analytical computation of the coefficient factor
+
+    .. math::
+
+        \lambda = (\\frac{l_{coil}}{l_{core}})^\\frac{-2}{5}
+
+    with:
+        - :math:`l_{coil}` : the length of the coil
+        - :math:`l_{core}` : the length of the core
+
     """
 
     def calculate(self, dependencies: dict, parameters: InputParameters):

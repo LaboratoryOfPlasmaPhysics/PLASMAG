@@ -3,7 +3,7 @@ from src.model.strategies.strategy_lib.capacitance import AnalyticalCapacitanceS
 from src.model.strategies.strategy_lib.frequency import FrequencyVectorStrategy
 from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrategy
 from src.model.strategies.strategy_lib.inductance import AnalyticalInductanceStrategy
-from src.model.strategies.strategy_lib.lambda_strategy import AnalyticalLambdaStrategy
+from src.model.strategies.strategy_lib.lambda_strategy import LukoschusAnalyticalLambdaStrategy
 from src.model.strategies.strategy_lib.mu_app import AnalyticalMu_appStrategy
 from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy
 
@@ -26,8 +26,8 @@ IMPEDANCE_STRATEGY_MAP = {
     },
 
      "lambda_param": {
-          "default": AnalyticalLambdaStrategy,
-          "strategies": [AnalyticalLambdaStrategy]
+          "default": LukoschusAnalyticalLambdaStrategy,
+          "strategies": [LukoschusAnalyticalLambdaStrategy]
      },
 
     "inductance": {
