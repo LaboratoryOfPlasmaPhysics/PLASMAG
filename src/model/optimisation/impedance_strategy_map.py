@@ -5,12 +5,12 @@ from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrat
 from src.model.strategies.strategy_lib.inductance import AnalyticalInductanceStrategy
 from src.model.strategies.strategy_lib.lambda_strategy import AnalyticalLambdaStrategy
 from src.model.strategies.strategy_lib.mu_app import AnalyticalMu_appStrategy
-from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy, AnalyticalResistanceStrategyv2
+from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy
 
 IMPEDANCE_STRATEGY_MAP = {
     "resistance": {
         "default": AnalyticalResistanceStrategy,
-        "strategies": [AnalyticalResistanceStrategy, AnalyticalResistanceStrategyv2]
+        "strategies": [AnalyticalResistanceStrategy]
     },
     "frequency_vector": {
         "default": FrequencyVectorStrategy,
@@ -43,7 +43,3 @@ IMPEDANCE_STRATEGY_MAP = {
         "strategies": [AnalyticalImpedanceStrategy]
     }
 }
-
-
-
-
