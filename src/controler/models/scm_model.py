@@ -9,7 +9,7 @@ from src.model.strategies.strategy_lib.OLTF import OLTF_Strategy_Non_Filtered, O
 from src.model.strategies.strategy_lib.TF_ASIC import TF_ASIC_Stage_1_Strategy_linear,  \
     TF_ASIC_Stage_2_Strategy_linear, TF_ASIC_Strategy_linear
 
-from src.model.strategies.strategy_lib.Nz import AnalyticalNzStrategy
+from src.model.strategies.strategy_lib.Nz import AnalyticalNzStrategy, AnalyticalNzDiaboloStrategy
 from src.model.strategies.strategy_lib.capacitance import AnalyticalCapacitanceStrategy
 from src.model.strategies.strategy_lib.frequency import FrequencyVectorStrategy
 from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrategy
@@ -32,7 +32,7 @@ STRATEGY_MAP = {
     },
     "Nz": {
         "default": AnalyticalNzStrategy,
-        "strategies": [AnalyticalNzStrategy]
+        "strategies": [AnalyticalNzStrategy, AnalyticalNzDiaboloStrategy]
     },
     "mu_app": {
         "default": AnalyticalMu_appStrategy,

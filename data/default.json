@@ -55,6 +55,14 @@
             "description": "Diameter of the core in millimeters",
             "input_unit": "millimeter",
             "target_unit": "meter"
+        },
+        "diabolo_diam_core": {
+            "default": 16,
+            "min": 1,
+            "max": 100,
+            "description": "Diameter of the diabolo part of the core in millimeters",
+            "input_unit": "millimeter",
+            "target_unit": "meter"
         }
     },
     "COIL": {
