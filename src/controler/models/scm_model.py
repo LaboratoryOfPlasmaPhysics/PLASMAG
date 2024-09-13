@@ -14,7 +14,7 @@ from src.model.strategies.strategy_lib.capacitance import AnalyticalCapacitanceS
 from src.model.strategies.strategy_lib.frequency import FrequencyVectorStrategy
 from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrategy
 from src.model.strategies.strategy_lib.inductance import AnalyticalInductanceStrategy
-from src.model.strategies.strategy_lib.lambda_strategy import LukoschusAnalyticalLambdaStrategy
+from src.model.strategies.strategy_lib.lambda_strategy import LukoschusAnalyticalLambdaStrategy, ClercAnalyticalLambdaStrategy
 from src.model.strategies.strategy_lib.mu_app import AnalyticalMu_appStrategy
 from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy, MultiLayerResistanceStrategy
 from src.model.strategies.strategy_lib.SPICE import SPICE_test, SPICE_op_Amp_gain, SPICE_op_Amp_transcient, \
@@ -38,10 +38,9 @@ STRATEGY_MAP = {
         "default": AnalyticalMu_appStrategy,
         "strategies": [AnalyticalMu_appStrategy]
     },
-
-     "lambda_param": {
+    "lambda_param": {
           "default": LukoschusAnalyticalLambdaStrategy,
-          "strategies": [LukoschusAnalyticalLambdaStrategy]
+          "strategies": [LukoschusAnalyticalLambdaStrategy, ClercAnalyticalLambdaStrategy]
      },
 
     "inductance": {
