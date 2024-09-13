@@ -16,6 +16,14 @@
             "input_unit": "dimensionless",
             "target_unit": "dimensionless"
         },
+        "epsilon_insulator": {
+            "default": 3.4,
+            "min": 1,
+            "max": 1000,
+            "description": "Relative permittivity of the insulator",
+            "input_unit": "dimensionless",
+            "target_unit": "dimensionless"
+        },
         "kapton_thick": {
             "default": 30.0,
             "min": 10,
