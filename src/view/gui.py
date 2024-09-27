@@ -1529,7 +1529,6 @@ class MainGUI(QMainWindow):
             """Plot a curve with metadata based on either frequency or time."""
             data = data_with_meta["data"]
             labels = data_with_meta.get("labels", ["", ""])
-            units = data_with_meta.get("units", ["", ""])
 
             if np.isscalar(data):
                 y_values = np.full_like(x_vector, data)
