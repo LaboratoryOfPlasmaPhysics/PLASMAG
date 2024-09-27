@@ -52,7 +52,7 @@ from qtrangeslider import QRangeSlider
 
 from src.controler.controller import CalculationController, STRATEGY_MAP
 from src.model.visualisation.create_tree import create_tree, add_title_description
-from src.view.optimisation_tab import OptimisationTab
+# from src.view.optimisation_tab import OptimisationTab
 
 ureg: UnitRegistry = UnitRegistry()
 
@@ -858,14 +858,14 @@ class MainGUI(QMainWindow):
         self.param_tab = QWidget()  # QWidget that will contain the parameters layout as a tab
         self.strategy_tab = QWidget()  # QWidget that will contain the strategy selection layout as a tab
         self.spice_tab = QWidget()  # QWidget that will contain the spice layout as a tab
-        self.optimisation_tab = OptimisationTab(self)  # QWidget that will contain the optimisation layout as a tab
-        self.EMC_tab = QWidget()  # QWidget that will contain the EMC layout as a tab
+        # self.optimisation_tab = OptimisationTab(self)  # QWidget that will contain the optimisation layout as a tab
+        # self.EMC_tab = QWidget()  # QWidget that will contain the EMC layout as a tab
 
         self.params_layout = QVBoxLayout(self.param_tab)
         self.strategy_layout = QVBoxLayout(self.strategy_tab)
         self.spice_layout = QVBoxLayout(self.spice_tab)
-        self.optimisation_layout = QVBoxLayout(self.optimisation_tab)
-        self.EMC_layout = QVBoxLayout(self.EMC_tab)
+        # self.optimisation_layout = QVBoxLayout(self.optimisation_tab)
+        # self.EMC_layout = QVBoxLayout(self.EMC_tab)
 
         # Grid layout for parameter inputs
         self.grid_layout = QGridLayout()  # Grid layout for global sliders
@@ -884,9 +884,9 @@ class MainGUI(QMainWindow):
 
         self.tabs.addTab(self.param_tab, "Parameters")
         self.tabs.addTab(self.strategy_tab, "Strategy Selection")
-        #self.tabs.addTab(self.spice_tab, "Spice Simulation")
-        self.tabs.addTab(self.optimisation_tab, "Optimisation")
-        self.tabs.addTab(self.EMC_tab, "EMC")
+        # self.tabs.addTab(self.spice_tab, "Spice Simulation")
+        # self.tabs.addTab(self.optimisation_tab, "Optimisation")
+        # self.tabs.addTab(self.EMC_tab, "EMC")
 
         self.plot_layout = QVBoxLayout()
 
