@@ -1533,17 +1533,17 @@ class MainGUI(QMainWindow):
 
             if np.isscalar(data):
                 y_values = np.full_like(x_vector, data)
-                canvas.axes.plot(x_vector, y_values, label=f"{labels[0]} ({units[0]})", linestyle=linestyle,
+                canvas.axes.plot(x_vector, y_values, label=f"{labels[0]}", linestyle=linestyle,
                                  color=color)
             elif isinstance(data, np.ndarray) and data.ndim == 1:
                 if len(data) == len(x_vector):  # Ensure matching lengths
-                    canvas.axes.plot(x_vector, data, label=f"{labels[0]} ({units[0]})", linestyle=linestyle,
+                    canvas.axes.plot(x_vector, data, label=f"{labels[0]}", linestyle=linestyle,
                                      color=color)
             elif isinstance(data, np.ndarray) and data.ndim > 1:
                 for col_index in range(1, data.shape[1]):
                     y_values = data[:, col_index]
                     if len(y_values) == len(x_vector):  # Ensure matching lengths
-                        canvas.axes.plot(x_vector, y_values, label=f"{labels[col_index]} ({units[col_index]})",
+                        canvas.axes.plot(x_vector, y_values, label=f"{labels[col_index]}",
                                          linestyle=linestyle, color=color)
 
         def get_x_vector(data_meta, default_vector):
@@ -1602,15 +1602,32 @@ class MainGUI(QMainWindow):
     def set_labels(self, data_meta, canvas):
         """Set labels and scales based on data type."""
         labels = data_meta.get("labels", [])
-        if "Time" in labels:
-            canvas.axes.set_xlabel("Time (s)")
-            canvas.axes.set_yscale('linear')
-            canvas.axes.set_xscale('linear')
-
+        units = data_meta.get("units", [])
+        log_or_linear = "log"
+        if len(labels) == 1:
+            x_label = "Frequency (Hz)"
+            y_label = f"{labels[0]}\n{units[0]}"
         else:
-            canvas.axes.set_xlabel("Frequency (Hz)")
-            canvas.axes.set_yscale('log')
-            canvas.axes.set_xscale('log')
+            if "time" in labels[0].lower():
+                log_or_linear = "linear"
+            x_label = f"{labels[0]} ({units[0]})"
+            if len(labels) == 2:
+                y_label = f"{labels[1]}\n{units[1]}"
+            else:
+                if "NSD" in labels[1]:
+                    label = "NSD"
+                elif "PSD" in labels[1]:
+                    label = "PSD"
+                elif "CLTF" in labels[1] and "OLTF" in labels[2]:
+                    label = "Transfert Function"
+                else:
+                    label = labels[1]
+                y_label = f"{label}\n{units[1]}"
+
+        canvas.axes.set_xlabel(x_label)
+        canvas.axes.set_ylabel(y_label)
+        canvas.axes.set_xscale(log_or_linear)
+        canvas.axes.set_yscale(log_or_linear)
 
     def plot_results(self, calculation_results):
         """
