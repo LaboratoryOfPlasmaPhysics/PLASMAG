@@ -1,72 +1,54 @@
-import numpy as np
+from numpy import pi, column_stack
 from src.model.input_parameters import InputParameters
 from src.model.strategies import CalculationStrategy
-from scipy.constants import mu_0
 
 
-# TODO : IMPLEMENTED from legacy code, need to be checked and corrected with the equations
-class OLTF_Strategy_Non_Filtered(CalculationStrategy):
+class OLTF_Strategy(CalculationStrategy):
+    """Analytical model of the Open Loop Transfer Function (OLTF)
 
+    .. math::
+
+        OLTF(f) = \\frac{\mu_{app} . N_s . S . \omega . H_1(f)}{\sqrt{(1 - L . C . \omega^2)^2 + (\omega . R . C)^2}}
+
+    With:
+        - :math:`\\mu_{app}` : apparent permeability of the core material
+        - :math:`N_{spire}` : number of spire of the coil
+        - :math:`S = \pi . R_s^2` le section of the core
+        - :math:`R_s` : radius of the spires
+        - :math:`\omega = 2 \pi f`
+        - :math:`f` : frequency
+        - :math:`H_1` : transfer function of the ASIC's stage 1
+        - :math:`R` : resistance of the coil
+        - :math:`L` : inductance of the coil
+        - :math:`C` : capacitance of the coil
+
+    """
     def calculate(self, dependencies: dict, parameters: InputParameters):
-        nb_spire = parameters.data['nb_spire']
-        ray_spire = parameters.data['ray_spire']
+        nb_spire = parameters.data["nb_spire"]
+        ray_spire = parameters.data["ray_spire"]
+        mu_app = dependencies["mu_app"]["data"]
+        frequency_vector = dependencies["frequency_vector"]["data"]
+        h2 = dependencies["TF_ASIC_Stage_2"]["data"][:, 1]
+        L = dependencies["inductance"]["data"]
+        C = dependencies["capacitance"]["data"]
+        R = dependencies["resistance"]["data"]
 
-        mu_app = dependencies['mu_app']['data']
-        frequency_vector = dependencies['frequency_vector']['data']
-        linear_TF_ASIC_Stage_1 = dependencies['TF_ASIC_Stage_1']['data'][:,1]
-        inductance = dependencies['inductance']['data']
-        capacitance = dependencies['capacitance']['data']
-        resistance = dependencies['resistance']['data']
+        omega = 2 * pi * frequency_vector
+        section = pi * ray_spire ** 2
+        numerator = nb_spire * section * mu_app * omega
+        denominator = ((1 - L * C * omega**2) ** 2 + (R * C * omega) ** 2) ** 0.5
+        oltf = numerator / denominator
+        oltf_filtered = oltf * h2
 
-        vectorized_oltf = np.vectorize(self.calculate_oltf)
-        oltf_values = vectorized_oltf(nb_spire, ray_spire, mu_app, frequency_vector, linear_TF_ASIC_Stage_1, inductance, capacitance, resistance)
-
-        frequency_oltf_tensor = np.column_stack((frequency_vector, oltf_values))
-        value =  frequency_oltf_tensor
+        results = column_stack((frequency_vector, oltf, oltf_filtered))
 
         return {
-            "data": value,
-            "labels": ["Frequency", "Gain"],
-            "units": ["Hz", ""]
-        }
-
-    def calculate_oltf(self,
-                       nb_spire,
-                       ray_spire,
-                       mu_app,
-                       f,
-                       TF_ASIC_Stage_1_point, L, C, R):
-
-        result = (nb_spire * (np.pi * (ray_spire)**2) * mu_app * 4 * np.pi * 10**-7 * TF_ASIC_Stage_1_point * (2* np.pi * f)) / ((1- L * C * (2*np.pi*f)**2)**2 + ((R * C * (2*np.pi*f))**2))**0.5
-        return result
-
-
-
-    @staticmethod
-    def get_dependencies():
-        return ['nb_spire', 'ray_spire', 'mu_app', 'frequency_vector', 'TF_ASIC_Stage_1', 'inductance', 'capacitance', 'resistance']
-
-
-
-class OLTF_Strategy_Filtered(CalculationStrategy):
-
-    def calculate(self, dependencies: dict, parameters: InputParameters):
-        OLTF_Non_filtered = 20*np.log10(dependencies['OLTF_Non_filtered']['data'][:,1]) # linear
-        TF_ASIC_Stage_2 = 20*np.log10(dependencies['TF_ASIC_Stage_2']['data'][:,1]) # linear
-
-        result = (OLTF_Non_filtered + TF_ASIC_Stage_2)
-
-        result = 10**(result/20)
-
-        result = np.column_stack((dependencies['OLTF_Non_filtered']['data'][:,0], result))
-
-        return {
-            "data": result,
-            "labels": ["Frequency", "Gain"],
-            "units": ["Hz", ""]
+            "data": results,
+            "labels": ["Frequency", "OLTF", "OLTF_filtered"],
+            "units": ["Hz", "m^2/s", "m^2/s"]
         }
 
     @staticmethod
     def get_dependencies():
-        return ['OLTF_Non_filtered', 'TF_ASIC_Stage_2']
-
+        return ["nb_spire", "ray_spire", "mu_app", "frequency_vector", "TF_ASIC_Stage_2",
+                "inductance", "capacitance", "resistance"]
