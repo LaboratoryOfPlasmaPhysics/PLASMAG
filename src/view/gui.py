@@ -668,9 +668,6 @@ class MainGUI(QMainWindow):
         spice_contents_layout.addLayout(self.spice_params_layout)
 
         print("Init spice settings")
-        print(self.spice_configs)
-
-        print(self.input_parameters)
         row = 0  # Initialize row counter
         if 'SPICE' in self.input_parameters:
             spice_params = self.input_parameters['SPICE']
@@ -703,6 +700,7 @@ class MainGUI(QMainWindow):
         circuit_name = self.spice_circuit_combo.itemText(index)  # Get selected circuit name
         self.merge_spice_parameters(circuit_name)
         circuit_config = self.spice_configs[circuit_name]  # Get the configuration for the selected circuit
+
         self.saved_circuit_name = circuit_name  # Store the selected circuit name
 
         if not self.first_run:
@@ -716,14 +714,12 @@ class MainGUI(QMainWindow):
 
         if len(self.saved_spice_parameters) > 0:
             self.saved_spice_strategies += self.saved_spice_parameters
-            print(self.saved_spice_strategies)
             self.saved_spice_parameters = []
 
         # get the "current" spice strategies
         if len(self.saved_spice_strategies) > 0:
             self.controller.delete_spice_nodes(self.saved_spice_strategies)
             self.saved_spice_strategies = []
-            print(self.controller.engine.nodes)
 
         for i in reversed(range(self.spice_params_layout.count())):
             widget = self.spice_params_layout.itemAt(i).widget()
@@ -760,8 +756,6 @@ class MainGUI(QMainWindow):
                 for strategy_name, strategy_instance in strategies_loaded.items():
                     self.saved_spice_strategies.append(strategy_name)
                     print(f"Loaded strategy {strategy_name}")
-                    print(type(strategy_instance))
-                    print(strategy_instance)
                     self.update_node_strategy(strategy_name, strategy_instance)
 
                     if not self.first_run:
@@ -910,7 +904,7 @@ class MainGUI(QMainWindow):
                 param_proportion = self.config_dict["param_proportion"]
                 plot_proportion = self.config_dict["plot_proportion"]
         except KeyError:
-            print("Error while setting proportions")
+            print("Plot error while setting proportions")
 
         self.main_splitter = QSplitter(Qt.Horizontal)
         self.main_layout.addWidget(self.main_splitter)
@@ -1205,7 +1199,6 @@ class MainGUI(QMainWindow):
                 return  # User canceled the dialog
 
             # Prepare the parameters with updated defaults based on current GUI inputs
-            print(self.input_parameters)
             updated_parameters = self.input_parameters.copy()
             for section_name, parameters in updated_parameters.items():
                 for param_name in parameters:
@@ -1257,7 +1250,6 @@ class MainGUI(QMainWindow):
                     fileName = path
             if fileName:
                 # If a file is selected, load the parameters from that file
-                print(fileName)
                 # with os merge full path with file name
 
                 path = os.path.dirname(os.path.abspath(__file__))
@@ -1765,10 +1757,7 @@ class MainGUI(QMainWindow):
         self.strategy_tab.layout().addWidget(scroll_area)
 
     def update_node_strategy(self, node_name, strategy_class):
-        print("update")
-        print(strategy_class)
-        print(type(strategy_class))
-        print(f"Gui - try to update strategy for {node_name} to {strategy_class.__name__}")
+        # print(f"Gui - try to update strategy for {node_name} to {strategy_class.__name__}")
 
         params_dict = self.retrieve_parameters()
 

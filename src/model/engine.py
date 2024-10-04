@@ -43,7 +43,6 @@ class CalculationEngine:
         self.first_run = True
 
         self.saved_data_results = [CalculationResults() for _ in range(backups_count)]
-        print(len(self.saved_data_results))
         print("Calculation Engine Initialized")
 
     def save_calculation_results(self, index):
@@ -59,9 +58,6 @@ class CalculationEngine:
         """
         self.saved_data_results = [CalculationResults() for _ in range(5)]
         print("Results cleared")
-
-
-
 
     def build_inverse_dependencies(self):
         """
@@ -286,8 +282,6 @@ class CalculationEngine:
         else:
             print(f"Node {node_name} not found in the calculation graph.")
 
-
-
     def get_affected_nodes(self, changed_params : dict):
         """
         Identifies nodes affected by the changed parameters.
@@ -407,6 +401,3 @@ class CalculationEngine:
         self.current_output_data = CalculationResults()
 
         self.run_calculations(affected_nodes)
-
-
-
