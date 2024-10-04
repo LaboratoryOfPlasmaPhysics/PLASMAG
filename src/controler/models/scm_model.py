@@ -3,8 +3,8 @@ from src.model.strategies.strategy_lib.Noise import PSD_R_cr, PSD_R_cr_filtered,
     Display_all_PSD, NEMI, Display_all_PSD_filtered, NEMI_FIltered, NEMI_FIlteredv2, NEMI_FIlteredv3, PSD_R_cr_V2, \
     PSD_R_cr_filtered_V2, PSD_R_Coil_V2, PSD_R_Coil_filtered_V2, PSD_Flicker_V2, PSD_e_en_V2, PSD_e_en_filtered_V2, \
     PSD_e_in_V2, PSD_e_in_filtered_V2
-from src.model.strategies.strategy_lib.CLTF import CLTF_Strategy_Filtered, \
-    CLTF_Strategy_Non_Filtered_legacy, Display_CLTF_OLTF
+from src.model.strategies.strategy_lib.CLTF import CLTF_Strategy, Display_CLTF_OLTF, \
+    Display_CLTF_OLTF_filtered
 from src.model.strategies.strategy_lib.OLTF import OLTF_Strategy
 from src.model.strategies.strategy_lib.TF_ASIC import TF_ASIC_Stage_1_Strategy_linear,  \
     TF_ASIC_Stage_2_Strategy_linear, TF_ASIC_Strategy_linear
@@ -71,17 +71,13 @@ STRATEGY_MAP = {
         "default": OLTF_Strategy,
         "strategies": [OLTF_Strategy]
     },
-    "CLTF_Non_filtered": {
-        "default": CLTF_Strategy_Non_Filtered_legacy,
-        "strategies": [CLTF_Strategy_Non_Filtered_legacy]
-    },
-    "CLTF_Filtered": {
-        "default": CLTF_Strategy_Filtered,
-        "strategies": [CLTF_Strategy_Filtered]
+    "CLTF": {
+        "default": CLTF_Strategy,
+        "strategies": [CLTF_Strategy]
     },
     "Display_CLTF_OLTF": {
         "default": Display_CLTF_OLTF,
-        "strategies": [Display_CLTF_OLTF]
+        "strategies": [Display_CLTF_OLTF, Display_CLTF_OLTF_filtered]
     },
     "PSD_R_cr": {
         "default": PSD_R_cr,

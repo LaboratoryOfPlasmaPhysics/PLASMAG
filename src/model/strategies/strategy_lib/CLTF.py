@@ -1,137 +1,93 @@
-import numpy as np
+from numpy import pi, column_stack
+
 from src.model.input_parameters import InputParameters
 from src.model.strategies import CalculationStrategy
-from scipy.constants import mu_0
 
 
-# TODO : IMPLEMENTED from legacy code, need to be checked and corrected with the equations
-class CLTF_Strategy_Non_Filtered(CalculationStrategy):
+class CLTF_Strategy(CalculationStrategy):
+    """Analytical model of the Closed Loop Transfer Function (CLTF)
 
-    def calculate(self, dependencies: dict, parameters: InputParameters):
-        nb_spire = parameters.data['nb_spire']
-        ray_spire = parameters.data['ray_spire']
-        mu_app = dependencies['mu_app']
-        frequency_vector = dependencies['frequency_vector']
-        TF_ASIC_Stage_1_linear = dependencies['TF_ASIC_Stage_1'][:,1]
+    .. math::
 
-        inductance = dependencies['inductance']
-        capacitance = dependencies['capacitance']
-        resistance = dependencies['resistance']
+        CLTF(f) = \\frac{\mu_{app} . N_s . S . \omega . H_1(f)}{\sqrt{(1 - L . C . \omega^2)^2 + \omega^2 . (R . C + \\frac{M . H_1(f)}{R_{CR}})^2}}
 
-        mutual_inductance = parameters.data['mutual_inductance']
-        feedback_resistance = parameters.data['feedback_resistance']
+    With:
+        - :math:`\\mu_{app}` : apparent permeability of the core material
+        - :math:`N_{spire}` : number of spire of the coil
+        - :math:`S = \pi . R_s^2` le section of the core
+        - :math:`R_s` : radius of the spires
+        - :math:`\omega = 2 \pi f`
+        - :math:`f` : frequency
+        - :math:`H_1` : transfer function of the ASIC's stage 1
+        - :math:`R` : resistance of the coil
+        - :math:`L` : inductance of the coil
+        - :math:`C` : capacitance of the coil
+        - :math:`M` : Mutual inductance (coupling factor between the main coil and the feedback coil)
+        - :math:`R_{CR}` : resistance of the counter-reaction coil
 
-        vectorized_oltf = np.vectorize(self.calculate_cltf)
-        oltf_values = vectorized_oltf(nb_spire, ray_spire, mu_app, frequency_vector, TF_ASIC_Stage_1_linear, inductance, capacitance, resistance, mutual_inductance, feedback_resistance)
-
-        frequency_oltf_tensor = np.column_stack((frequency_vector, oltf_values))
-        return {
-            "data": frequency_oltf_tensor,
-            "labels": ["Frequency", "Gain"],
-            "units": ["Hz", ""]
-        }
-
-    def calculate_cltf(self,
-                       nb_spire,
-                       ray_spire,
-                       mu_app,
-                       f,
-                       TF_ASIC_Stage_1_point, L, C, R,
-                       mutual_inductance, feedback_resistance):
-        result = (((nb_spire * (np.pi * (ray_spire)**2) * mu_app * 4 * np.pi * 10**-7 * (2* np.pi * f)) - ((2* np.pi * f) * mutual_inductance * (TF_ASIC_Stage_1_point/feedback_resistance)))**2)**0.5  / ((1- L * C * (2*np.pi*f)**2)**2 + ((R * C * (2*np.pi*f))**2))**0.5
-        return result
-
-
-
-
-
-    @staticmethod
-    def get_dependencies():
-        return ['nb_spire', 'ray_spire', 'mu_app', 'frequency_vector', 'TF_ASIC_Stage_1', 'inductance', 'capacitance', 'resistance', 'mutual_inductance', 'feedback_resistance']
-
-class CLTF_Strategy_Non_Filtered_legacy(CalculationStrategy):
+    """
 
     def calculate(self, dependencies: dict, parameters: InputParameters):
-        nb_spire = parameters.data['nb_spire']
-        ray_spire = parameters.data['ray_spire']
-        mutual_inductance = parameters.data['mutual_inductance']
-        feedback_resistance = parameters.data['feedback_resistance']
+        nb_spire = parameters.data["nb_spire"]
+        ray_spire = parameters.data["ray_spire"]
+        mu_app = dependencies["mu_app"]["data"]
+        frequency_vector = dependencies["frequency_vector"]["data"]
+        nsd_normalisation = dependencies["NSD_normalisation"]["data"][:, 1]
+        h2 = dependencies["TF_ASIC_Stage_2"]["data"][:, 1]
 
-        mu_app = dependencies['mu_app']['data']
-        frequency_vector = dependencies['frequency_vector']['data']
-        TF_ASIC_Stage_1_linear = dependencies['TF_ASIC_Stage_1']['data'][:,1]
-        inductance = dependencies['inductance']['data']
-        capacitance = dependencies['capacitance']['data']
-        resistance = dependencies['resistance']['data']
+        omega = 2 * pi * frequency_vector
+        section = pi * ray_spire ** 2
+        numerator = nb_spire * section * mu_app * omega
+        cltf = numerator / nsd_normalisation
+        cltf_filtered = cltf * h2
 
-
-
-        vectorized_oltf = np.vectorize(self.calculate_cltf)
-        oltf_values = vectorized_oltf(nb_spire, ray_spire, mu_app, frequency_vector, TF_ASIC_Stage_1_linear, inductance, capacitance, resistance, mutual_inductance, feedback_resistance)
-
-        frequency_oltf_tensor = np.column_stack((frequency_vector, oltf_values))
-        values = frequency_oltf_tensor
+        results = column_stack((frequency_vector, cltf, cltf_filtered))
 
         return {
-            "data": values,
-            "labels": ["Frequency", "Gain"],
-            "units": ["Hz", ""]
-        }
-
-    def calculate_cltf(self,
-                       nb_spire,
-                       ray_spire,
-                       mu_app,
-                       f,
-                       TF_ASIC_Stage_1_point, L, C, R,
-                       mutual_inductance, feedback_resistance):
-        result = (nb_spire * (np.pi * (ray_spire)**2) * mu_app * 4 * np.pi * 10**-7 * (2* np.pi * f)* TF_ASIC_Stage_1_point)  / ((1- L * C * (2*np.pi*f)**2)**2 + (((2*np.pi*f)*R*C + (2*np.pi*f)*mutual_inductance * TF_ASIC_Stage_1_point/feedback_resistance)**2))**0.5
-        return result
-
-
-
-
-
-    @staticmethod
-    def get_dependencies():
-        return ['nb_spire', 'ray_spire', 'mu_app', 'frequency_vector', 'TF_ASIC_Stage_1', 'inductance', 'capacitance', 'resistance', 'mutual_inductance', 'feedback_resistance']
-
-
-
-class CLTF_Strategy_Filtered(CalculationStrategy):
-
-    def calculate(self, dependencies: dict, parameters: InputParameters):
-        OLTF_Non_filtered = 20*np.log10(dependencies['CLTF_Non_filtered']["data"][:,1]) # linear
-        TF_ASIC_Stage_2 = 20*np.log10(dependencies['TF_ASIC_Stage_2']["data"][:,1]) # linear
-
-        result = OLTF_Non_filtered + TF_ASIC_Stage_2
-        result = 10**(result/20)
-        result = np.column_stack((dependencies['CLTF_Non_filtered']["data"][:,0], result))
-        return {
-            "data": result,
-            "labels": ["Frequency", "Gain"],
-            "units": ["Hz", ""]
+            "data": results,
+            "labels": ["Frequency", "CLTF", "CLTF_filtered"],
+            "units": ["Hz", "m^2/s", "m^2/s"]
         }
 
     @staticmethod
     def get_dependencies():
-        return ['CLTF_Non_filtered', 'TF_ASIC_Stage_2']
+        return ["nb_spire", "ray_spire", "mu_app", "frequency_vector", "TF_ASIC_Stage_2",
+                "NSD_normalisation"]
 
 
 class Display_CLTF_OLTF(CalculationStrategy):
 
     def calculate(self, dependencies: dict, parameters: InputParameters):
-        CLTF = dependencies['CLTF_Filtered']["data"]
-        OLTF = dependencies['OLTF_Filtered']["data"]
+        frequency_vector = dependencies["CLTF"]["data"][:, 0]
+        cltf = dependencies["CLTF"]["data"][:, 1]
+        oltf = dependencies["OLTF"]["data"][:, 1]
 
-        result = np.column_stack((CLTF[:,0], CLTF[:,1], OLTF[:,1]))
+        result = column_stack((frequency_vector, cltf, oltf))
         return {
             "data": result,
             "labels": ["Frequency", "CLTF", "OLTF"],
-            "units": ["Hz", "", ""]
+            "units": ["Hz", "m^2/s", "m^2/s"]
         }
 
     @staticmethod
     def get_dependencies():
-        return ['CLTF_Filtered', 'OLTF_Filtered']
+        return ["CLTF", "OLTF"]
 
+
+class Display_CLTF_OLTF_filtered(CalculationStrategy):
+
+    def calculate(self, dependencies: dict, parameters: InputParameters):
+        frequency_vector = dependencies["CLTF"]["data"][:, 0]
+        cltf = dependencies["CLTF"]["data"][:, 2]
+        oltf = dependencies["OLTF"]["data"][:, 2]
+
+        result = column_stack((frequency_vector, cltf, oltf))
+        return {
+            "data": result,
+            "labels": ["Frequency", "CLTF_filtered", "OLTF_filtered"],
+            "units": ["Hz", "m^2/s", "m^2/s"]
+        }
+
+    @staticmethod
+    def get_dependencies():
+        return ["CLTF", "OLTF"]
