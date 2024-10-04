@@ -1,81 +1,107 @@
-import numpy as np
+from numpy import column_stack
 from src.model.input_parameters import InputParameters
 from src.model.strategies import CalculationStrategy
 
+
 class TF_ASIC_Stage_1_Strategy_linear(CalculationStrategy):
+    """Analytical model for ASIC stage 1 transfer function
 
+    .. math::
+
+        H_1(f) = \\frac{gain_1}{\sqrt{1 + (\\frac{f}{f_{c1}})^2}}
+
+    with:
+        - :math:`gain_1` : gain of the ASIC's stage 1
+        - :math:`f` : the frequency
+        - :math:`f_{c1}` : the cutting frequency of the 1st stage of the ASIC
+
+    """
     def calculate(self, dependencies: dict, parameters: InputParameters):
-        gain_1 = parameters.data['gain_1_linear']
-        stage_1_cutting_freq = parameters.data['stage_1_cutting_freq']
-        frequency_vector = dependencies['frequency_vector']['data']
+        gain_1 = parameters.data["gain_1_linear"]
+        stage_1_cutting_freq = parameters.data["stage_1_cutting_freq"]
+        frequency_vector = dependencies["frequency_vector"]["data"]
 
-        vectorized_tf_stage_1 = np.vectorize(self.calculate_tf_stage_1)
-        tf_stage_1_values = vectorized_tf_stage_1(gain_1, stage_1_cutting_freq, frequency_vector)
+        numerator = gain_1
+        denominator = (1 + (frequency_vector / stage_1_cutting_freq) ** 2) ** 0.5
+        tf_asic = numerator / denominator
 
-
-        frequency_tf_stage_1_tensor = np.column_stack((frequency_vector, tf_stage_1_values))
-        value = frequency_tf_stage_1_tensor
+        results = column_stack((frequency_vector, tf_asic))
 
         return {
-            "data": value,
-            "labels": ["Frequency", "Gain"],
+            "data": results,
+            "labels": ["Frequency", "Transfer Function"],
             "units": ["Hz", ""]
         }
 
-    def calculate_tf_stage_1(self, gain_1, stage_1_cutting_freq, f):
-        return gain_1 * (1 / np.sqrt(1 + (f / stage_1_cutting_freq) ** 2))
-
     @staticmethod
     def get_dependencies():
-        return ['gain_1_linear', 'stage_1_cutting_freq', 'frequency_vector']
+        return ["gain_1_linear", "stage_1_cutting_freq", "frequency_vector"]
 
 
 class TF_ASIC_Stage_2_Strategy_linear(CalculationStrategy):
+    """Analytical model for ASIC stage 2 transfer function
+
+    .. math::
+
+        H_2(f) = \\frac{gain_2}{\sqrt{1 + (\\frac{f}{f_{c2}})^2}}
+
+    with:
+        - :math:`gain_2` : gain of the ASIC's stage 2
+        - :math:`f` : the frequency
+        - :math:`f_{c2}` : the cutting frequency of the 2nd stage of the ASIC
+
+    """
 
     def calculate(self, dependencies: dict, parameters: InputParameters):
-        gain_2 = parameters.data['gain_2_linear']
-        stage_2_cutting_freq = parameters.data['stage_2_cutting_freq'] # Cutting frequency of the second stage in Hz
-        frequency_vector = dependencies['frequency_vector']['data']
+        gain_2 = parameters.data["gain_2_linear"]
+        stage_2_cutting_freq = parameters.data["stage_2_cutting_freq"] # Cutting frequency of the second stage in Hz
+        frequency_vector = dependencies["frequency_vector"]["data"]
 
-        vectorized_tf_stage_2 = np.vectorize(self.calculate_tf_stage_2)
-        tf_stage_2_values = vectorized_tf_stage_2(gain_2, stage_2_cutting_freq, frequency_vector)
+        numerator = gain_2
+        denominator = (1 + (frequency_vector / stage_2_cutting_freq) ** 2) ** 0.5
+        tf_asic = numerator / denominator
 
-
-        frequency_tf_stage_2_tensor = np.column_stack((frequency_vector, tf_stage_2_values))
-        value = frequency_tf_stage_2_tensor
+        results = column_stack((frequency_vector, tf_asic))
 
         return {
-            "data": value,
-            "labels": ["Frequency", "Gain"],
+            "data": results,
+            "labels": ["Frequency", "Transfer Function"],
             "units": ["Hz", ""]
         }
 
-    def calculate_tf_stage_2(self, gain_2, stage_2_cutting_freq, f):
-        return gain_2 * (1 / np.sqrt(1 + (f / stage_2_cutting_freq) ** 2))
-
     @staticmethod
     def get_dependencies():
-        return ['gain_2_linear', 'stage_2_cutting_freq', 'frequency_vector']
+        return ["gain_2_linear", "stage_2_cutting_freq", "frequency_vector"]
 
 
 class TF_ASIC_Strategy_linear(CalculationStrategy):
+    """Analytical model of the total ASIC transfer function
+
+    .. math::
+
+        H(f) = H_1(f) . H_2(f)
+
+    with:
+        - :math:`H_1` : transfer function of the ASIC's stage 1
+        - :math:`H_2` : transfer function of the ASIC's stage 2
+        - :math:`f` : the frequency
+
+    """
 
     def calculate(self, dependencies: dict, parameters: InputParameters):
-        TF_ASIC_Stage_1_linear = dependencies['TF_ASIC_Stage_1']['data'][:,1]
-        TF_ASIC_Stage_2 = dependencies['TF_ASIC_Stage_2']['data'][:,1]
+        tf_asic_stage1 = dependencies["TF_ASIC_Stage_1"]["data"][:, 1]
+        tf_asic_stage2 = dependencies["TF_ASIC_Stage_2"]["data"][:, 1]
 
-        frequency_vector = dependencies['frequency_vector']['data']
+        frequency_vector = dependencies["frequency_vector"]["data"]
 
-        TF_ASICs_tensor = np.column_stack((frequency_vector, TF_ASIC_Stage_1_linear * TF_ASIC_Stage_2))
-
-        value = TF_ASICs_tensor
+        results = column_stack((frequency_vector, tf_asic_stage1 * tf_asic_stage2))
 
         return {
-            "data": value,
-            "labels": ["Frequency", "Gain"],
+            "data": results,
+            "labels": ["Frequency", "Transfer Function"],
             "units": ["Hz", ""]
         }
 
     @staticmethod
     def get_dependencies():
-        return ['TF_ASIC_Stage_1', 'TF_ASIC_Stage_2', 'frequency_vector']
+        return ["TF_ASIC_Stage_1", "TF_ASIC_Stage_2", "frequency_vector"]
