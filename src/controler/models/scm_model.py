@@ -1,4 +1,4 @@
-from src.model.strategies.strategy_lib.noise_optim import NSD_R_cr, NSD_R_Coil, NSD_Flicker, \
+from src.model.strategies.strategy_lib.Noise import NSD_R_cr, NSD_R_Coil, NSD_Flicker, \
     NSD_e_en, NSD_e_in, NSD_Total, Display_all_NSD, Display_all_PSD, Display_all_NSD_filtered, \
     Display_all_PSD_filtered, NEMI, NSD_normalisation
 from src.model.strategies.strategy_lib.CLTF import CLTF_Strategy, Display_CLTF_OLTF, \
