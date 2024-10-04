@@ -1,13 +1,11 @@
-import numpy as np
+from sys import platform
+from numpy import abs, array, interp, column_stack
 from src.model.input_parameters import InputParameters
 from src.model.strategies import CalculationStrategy
 
-import PySpice
 import PySpice.Logging.Logging as Logging
-import numpy as np
-from PySpice.Spice.Netlist import Circuit, SubCircuit
+from PySpice.Spice.Netlist import Circuit
 from PySpice.Unit import *
-from matplotlib import pyplot as plt
 
 
 class SPICE_test(CalculationStrategy):
@@ -40,19 +38,17 @@ class SPICE_test(CalculationStrategy):
         analysis = simulator.ac(start_frequency=f_start@ u_Hz, stop_frequency=f_stop@u_Hz, number_of_points=10,
                                 variation='dec')  # 1 to 1MHz, 10 points per decade
 
-        gain_node_1 = np.absolute(analysis.n1)
-        gain_node_2 = np.absolute(analysis.n2)
-        gain_node_3 = np.absolute(analysis.n3)
+        gain_node_1 = abs(analysis.n1)
+        gain_node_2 = abs(analysis.n2)
+        gain_node_3 = abs(analysis.n3)
 
-        analysis_freq = np.array(analysis.frequency)
+        analysis_freq = array(analysis.frequency)
 
-        interpolated_gain_1 = np.interp(frequency_vector, analysis_freq, gain_node_1)
-        interpolated_gain_2 = np.interp(frequency_vector, analysis_freq, gain_node_2)
-        interpolated_gain_3 = np.interp(frequency_vector, analysis_freq, gain_node_3)
+        interpolated_gain_1 = interp(frequency_vector, analysis_freq, gain_node_1)
+        interpolated_gain_2 = interp(frequency_vector, analysis_freq, gain_node_2)
+        interpolated_gain_3 = interp(frequency_vector, analysis_freq, gain_node_3)
 
-        result = np.column_stack((frequency_vector, interpolated_gain_1, interpolated_gain_2, interpolated_gain_3))
-
-        #
+        result = column_stack((frequency_vector, interpolated_gain_1, interpolated_gain_2, interpolated_gain_3))
 
         return {
             "data": result,
@@ -60,87 +56,86 @@ class SPICE_test(CalculationStrategy):
             "units": ["Hz", "V/V", "V/V", "V/V"]
         }
 
-
-
     @staticmethod
     def get_dependencies():
         return ['frequency_vector', "f_start", "f_stop", "spice_resistance_test", "temperature"]
 
-class SPICE_op_Amp_gain(CalculationStrategy):
-    def calculate(self, dependencies: dict, parameters: InputParameters):
-        temperature = parameters.data['temperature']
-        f_start = parameters.data['f_start']
-        f_stop = parameters.data['f_stop']
 
-        R1 = parameters.data['R1']
-        R2 = parameters.data['R2']
-        R3 = parameters.data['R3']
-        R4 = parameters.data['R4']
-        R5 = parameters.data['R5']
+if platform != "win32":
+    class SPICE_op_Amp_gain(CalculationStrategy):
+        def calculate(self, dependencies: dict, parameters: InputParameters):
+            temperature = parameters.data['temperature']
+            f_start = parameters.data['f_start']
+            f_stop = parameters.data['f_stop']
 
-        frequency_vector = dependencies['frequency_vector']['data']
-        logger = Logging.setup_logging()
+            R1 = parameters.data['R1']
+            R2 = parameters.data['R2']
+            R3 = parameters.data['R3']
+            R4 = parameters.data['R4']
+            R5 = parameters.data['R5']
 
-        # convert temperature to degrees Celsius
-        temperature = temperature - 273.15
+            frequency_vector = dependencies['frequency_vector']['data']
+            logger = Logging.setup_logging()
 
+            # convert temperature to degrees Celsius
+            temperature = temperature - 273.15
 
-        opAMP = 'src/model/strategies/strategy_lib/spice_lib/uA741.lib'
+            opAMP = 'src/model/strategies/strategy_lib/spice_lib/uA741.lib'
 
-        ##*********************************************
-        ## Circuit Netlist
-        circuit = Circuit('Op-amp circuits - Example 1 Non-inverting op-amp Amplifier')
-        circuit.include(opAMP)
+            ##*********************************************
+            ## Circuit Netlist
+            circuit = Circuit('Op-amp circuits - Example 1 Non-inverting op-amp Amplifier')
+            circuit.include(opAMP)
 
-        # Define amplitude and frequency of input sinusoid
-        amp = 0.1 @ u_V
-        freq = 1 @ u_kHz
+            # Define amplitude and frequency of input sinusoid
+            amp = 0.1 @ u_V
+            freq = 1 @ u_kHz
 
-        # Define transient simulation step time and stop time
-        steptime = 1 @ u_us
-        finaltime = 5 * (1 / freq)
+            # Define transient simulation step time and stop time
+            steptime = 1 @ u_us
+            finaltime = 5 * (1 / freq)
 
-        source = circuit.SinusoidalVoltageSource(1, 'input', circuit.gnd, amplitude=amp, frequency=freq)
-        circuit.V(2, '+Vcc', circuit.gnd, 15 @ u_V)
-        circuit.V(3, '-Vcc', circuit.gnd, -15 @ u_V)
+            source = circuit.SinusoidalVoltageSource(1, 'input', circuit.gnd, amplitude=amp, frequency=freq)
+            circuit.V(2, '+Vcc', circuit.gnd, 15 @ u_V)
+            circuit.V(3, '-Vcc', circuit.gnd, -15 @ u_V)
 
-        circuit.X(1, 'uA741', 'input', 'v-', '+Vcc', '-Vcc', 'out')
+            circuit.X(1, 'uA741', 'input', 'v-', '+Vcc', '-Vcc', 'out')
 
-        circuit.R(1, 'v-', circuit.gnd, R1@ u_Ω)
-        circuit.R(2, 'v-', 'x', R2@ u_Ω)
-        circuit.R(3, 'x', 'out', R3@ u_Ω)
-        circuit.R(4, 'x', circuit.gnd, R4@ u_Ω)
-        circuit.R('L', 'out', circuit.gnd, R5@ u_Ω)
+            circuit.R(1, 'v-', circuit.gnd, R1@ u_Ω)
+            circuit.R(2, 'v-', 'x', R2@ u_Ω)
+            circuit.R(3, 'x', 'out', R3@ u_Ω)
+            circuit.R(4, 'x', circuit.gnd, R4@ u_Ω)
+            circuit.R('L', 'out', circuit.gnd, R5@ u_Ω)
 
-        ##*********************************************
-        ## Simulation: Transient Analysis
-        simulator = circuit.simulator(temperature=temperature, nominal_temperature=25)
-        analysis = simulator.transient(step_time=steptime, end_time=finaltime)
-        analysis = simulator.ac(start_frequency=f_start @ u_Hz, stop_frequency=f_stop @ u_Hz, number_of_points=10,
-                                variation='dec')  # 1 to 1MHz, 10 points per decade
+            ##*********************************************
+            ## Simulation: Transient Analysis
+            simulator = circuit.simulator(temperature=temperature, nominal_temperature=25)
+            analysis = simulator.transient(step_time=steptime, end_time=finaltime)
+            analysis = simulator.ac(start_frequency=f_start @ u_Hz, stop_frequency=f_stop @ u_Hz, number_of_points=10,
+                                    variation='dec')  # 1 to 1MHz, 10 points per decade
 
-        #print all nodes in the analysis
+            #print all nodes in the analysis
 
-        input = np.absolute(analysis['input'])
-        output = np.absolute(analysis['out'])
+            input = abs(analysis['input'])
+            output = abs(analysis['out'])
 
-        simulation_freq = np.array(analysis.frequency)
+            simulation_freq = array(analysis.frequency)
 
+            interpolated_input = interp(frequency_vector, simulation_freq, input)
+            interpolated_output = interp(frequency_vector, simulation_freq, output)
 
-        interpolated_input = np.interp(frequency_vector, simulation_freq, input)
-        interpolated_output = np.interp(frequency_vector, simulation_freq, output)
+            result = column_stack((frequency_vector, interpolated_input, interpolated_output))
 
-        result = np.column_stack((frequency_vector, interpolated_input, interpolated_output))
+            return {
+                    "data": result,
+                    "labels": ["Frequency", "Gain Input", "Gain output"],
+                    "units": ["Hz", "V/V", "V/V"]
+                }
 
-        return {
-                "data": result,
-                "labels": ["Frequency", "Gain Input", "Gain output"],
-                "units": ["Hz", "V/V", "V/V"]
-            }
+        @staticmethod
+        def get_dependencies():
+            return ['frequency_vector', "f_start", "f_stop", "spice_resistance_test", "temperature", "R1", "R2", "R3", "R4", "R5"]
 
-    @staticmethod
-    def get_dependencies():
-        return ['frequency_vector', "f_start", "f_stop", "spice_resistance_test", "temperature", "R1", "R2", "R3", "R4", "R5"]
 
 class SPICE_op_Amp_noise(CalculationStrategy):
     def calculate(self, dependencies: dict, parameters: InputParameters):
@@ -185,16 +180,14 @@ class SPICE_op_Amp_noise(CalculationStrategy):
                                    stop_frequency=f_stop @ u_Hz, number_of_points=len(frequency_vector),
                                    variation='lin')
 
-
-
         # Retrieve noise data for each frequency
-        frequency = np.array(analysis.frequency)
-        output_noise_voltage = np.array(analysis.noise_output_voltage_density)
+        frequency = array(analysis.frequency)
+        output_noise_voltage = array(analysis.noise_output_voltage_density)
 
         # Interpolate the results onto the frequency vector if necessary
-        interpolated_noise = np.interp(frequency_vector, frequency, output_noise_voltage)
+        interpolated_noise = interp(frequency_vector, frequency, output_noise_voltage)
 
-        result = np.column_stack((frequency_vector, interpolated_noise))
+        result = column_stack((frequency_vector, interpolated_noise))
 
         return {
             "data": result,
@@ -207,77 +200,78 @@ class SPICE_op_Amp_noise(CalculationStrategy):
         return ['frequency_vector', "f_start", "f_stop", "temperature", "R1", "R2", "R3", "R4", "R5"]
 
 
-class SPICE_op_Amp_transcient(CalculationStrategy):
-    def calculate(self, dependencies: dict, parameters: InputParameters):
-        temperature = parameters.data['temperature']
-        f_start = parameters.data['f_start']
-        f_stop = parameters.data['f_stop']
+if platform != "win32":
+    class SPICE_op_Amp_transcient(CalculationStrategy):
+        def calculate(self, dependencies: dict, parameters: InputParameters):
+            temperature = parameters.data['temperature']
+            f_start = parameters.data['f_start']
+            f_stop = parameters.data['f_stop']
 
-        R1 = parameters.data['R1']
-        R2 = parameters.data['R2']
-        R3 = parameters.data['R3']
-        R4 = parameters.data['R4']
-        R5 = parameters.data['R5']
+            R1 = parameters.data['R1']
+            R2 = parameters.data['R2']
+            R3 = parameters.data['R3']
+            R4 = parameters.data['R4']
+            R5 = parameters.data['R5']
 
-        resistance = dependencies['resistance']['data']
+            resistance = dependencies['resistance']['data']
 
-        frequency_vector = dependencies['frequency_vector']['data']
-        logger = Logging.setup_logging()
+            frequency_vector = dependencies['frequency_vector']['data']
+            logger = Logging.setup_logging()
 
-        # convert temperature to degrees Celsius
-        temperature = temperature - 273.15
+            # convert temperature to degrees Celsius
+            temperature = temperature - 273.15
 
-        opAMP = 'src/model/strategies/strategy_lib/spice_lib/uA741.lib'
+            opAMP = 'src/model/strategies/strategy_lib/spice_lib/uA741.lib'
 
-        ##*********************************************
-        ## Circuit Netlist
-        circuit = Circuit('Op-amp circuits - Example 1 Non-inverting op-amp Amplifier')
-        circuit.include(opAMP)
+            ##*********************************************
+            ## Circuit Netlist
+            circuit = Circuit('Op-amp circuits - Example 1 Non-inverting op-amp Amplifier')
+            circuit.include(opAMP)
 
-        # Define amplitude and frequency of input sinusoid
-        amp = 0.1 @ u_V
-        freq = 1 @ u_kHz
+            # Define amplitude and frequency of input sinusoid
+            amp = 0.1 @ u_V
+            freq = 1 @ u_kHz
 
-        # Define transient simulation step time and stop time
-        steptime = 1 @ u_us
-        finaltime = 5 * (1 / freq)
+            # Define transient simulation step time and stop time
+            steptime = 1 @ u_us
+            finaltime = 5 * (1 / freq)
 
-        source = circuit.SinusoidalVoltageSource(1, 'input', circuit.gnd, amplitude=amp, frequency=freq)
-        circuit.V(2, '+Vcc', circuit.gnd, 15 @ u_V)
-        circuit.V(3, '-Vcc', circuit.gnd, -15 @ u_V)
+            source = circuit.SinusoidalVoltageSource(1, 'input', circuit.gnd, amplitude=amp, frequency=freq)
+            circuit.V(2, '+Vcc', circuit.gnd, 15 @ u_V)
+            circuit.V(3, '-Vcc', circuit.gnd, -15 @ u_V)
 
-        circuit.X(1, 'uA741', 'input', 'v-', '+Vcc', '-Vcc', 'out')
+            circuit.X(1, 'uA741', 'input', 'v-', '+Vcc', '-Vcc', 'out')
 
-        circuit.R(1, 'v-', circuit.gnd, resistance @ u_Ω)
-        circuit.R(2, 'v-', 'x', R2 @ u_Ω)
-        circuit.R(3, 'x', 'out', R3 @ u_Ω)
-        circuit.R(4, 'x', circuit.gnd, R4 @ u_Ω)
-        circuit.R('L', 'out', circuit.gnd, R5 @ u_Ω)
+            circuit.R(1, 'v-', circuit.gnd, resistance @ u_Ω)
+            circuit.R(2, 'v-', 'x', R2 @ u_Ω)
+            circuit.R(3, 'x', 'out', R3 @ u_Ω)
+            circuit.R(4, 'x', circuit.gnd, R4 @ u_Ω)
+            circuit.R('L', 'out', circuit.gnd, R5 @ u_Ω)
 
-        ##*********************************************
-        ## Simulation: Transient Analysis
-        simulator = circuit.simulator(temperature=temperature, nominal_temperature=25)
-        analysis = simulator.transient(step_time=steptime, end_time=finaltime)
+            ##*********************************************
+            ## Simulation: Transient Analysis
+            simulator = circuit.simulator(temperature=temperature, nominal_temperature=25)
+            analysis = simulator.transient(step_time=steptime, end_time=finaltime)
 
-        # print all nodes in the analysis
+            # print all nodes in the analysis
 
-        input = analysis['input']
-        output = analysis['out']
+            input = analysis['input']
+            output = analysis['out']
 
-        time = np.array(analysis.time)
+            time = array(analysis.time)
 
-        result = np.column_stack((time, input, output))
+            result = column_stack((time, input, output))
 
-        return {
-            "data": result,
-            "labels": ["Time", "Signal Input", "Signal output"],
-            "units": ["s", "V", "V"]
-        }
+            return {
+                "data": result,
+                "labels": ["Time", "Signal Input", "Signal output"],
+                "units": ["s", "V", "V"]
+            }
 
-    @staticmethod
-    def get_dependencies():
-        return ['frequency_vector', "f_start", "f_stop", "spice_resistance_test", "temperature", "R1", "R2", "R3", "resistance",
-                "R4", "R5"]
+        @staticmethod
+        def get_dependencies():
+            return ['frequency_vector', "f_start", "f_stop", "spice_resistance_test", "temperature", "R1", "R2", "R3", "resistance",
+                    "R4", "R5"]
 
 
 class SPICE_impedance(CalculationStrategy):
@@ -315,15 +309,14 @@ class SPICE_impedance(CalculationStrategy):
                                 variation='dec')  # 1 to 1MHz, 10 points per decade
 
         frequency = analysis.frequency
-        voltage_N1 = np.absolute(analysis['N001'])
-        current_R2 = np.absolute(analysis['vr2_plus'])
+        voltage_N1 = abs(analysis['N001'])
+        current_R2 = abs(analysis['vr2_plus'])
 
         Z = voltage_N1 / current_R2
 
-
-        simulation_freq = np.array(analysis.frequency)
-        interpolated_Z = np.interp(frequency_vector, simulation_freq, Z)
-        result = np.column_stack((frequency_vector, interpolated_Z))
+        simulation_freq = array(analysis.frequency)
+        interpolated_Z = interp(frequency_vector, simulation_freq, Z)
+        result = column_stack((frequency_vector, interpolated_Z))
 
         return {
             "data": result,
@@ -346,15 +339,11 @@ if __name__ == "__main__" :
     from matplotlib.pyplot import semilogx
     from matplotlib import pyplot
 
-    import PySpice.Logging.Logging as Logging
-
     logger = Logging.setup_logging()
 
     from PySpice.Doc.ExampleTools import find_libraries
     from PySpice.Probe.Plot import plot
     from PySpice.Spice.Library import SpiceLibrary
-    from PySpice.Spice.Netlist import Circuit
-    from PySpice.Unit import *
 
     ##*********************************************
     # Set the path where the op-amp uA741.lib file is located
@@ -423,10 +412,3 @@ if __name__ == "__main__" :
     #
     # plt.tight_layout()
     # plt.show()
-
-
-
-
-
-
-
