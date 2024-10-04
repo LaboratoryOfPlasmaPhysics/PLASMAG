@@ -1,0 +1,25 @@
+name: PLASMAG
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.18
+  - matplotlib=3.8.3
+  - numpy=1.26.4
+  - pylint=3.1.0
+  - scipy=1.12.0
+  - pip=24.0
+  - pint=0.23
+  - pandas=2.2.1
+  - networkx=3.2.1
+  - ngspice=32
+  - pip:
+      - beautifulsoup4==4.12.3
+      - pyqt6==6.6.1
+      - pyqt6-qt6==6.6.2
+      - pyqt6-sip==13.6.0
+      - qtrangeslider==0.1.5
+      - PySpice==1.4.3
+      - python-louvain==0.16
+      - pyvis==0.3.2
+      - seaborn==0.13.2
