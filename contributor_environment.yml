@@ -1,4 +1,4 @@
-name: PLASMAG_22
+name: PLASMAG_contrib
 channels:
   - conda-forge
   - defaults
@@ -13,7 +13,7 @@ dependencies:
   - pint=0.23
   - pandas=2.2.1
   - networkx=3.2.1
-  - ngspice=31
+  - ngspice=32
   - pip:
       - beautifulsoup4==4.12.3
       - pyqt6==6.6.1
