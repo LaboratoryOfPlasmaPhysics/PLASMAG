@@ -1,8 +1,6 @@
-from src.model.strategies.strategy_lib.Noise import PSD_R_cr, PSD_R_cr_filtered, PSD_R_Coil, PSD_R_Coil_filtered, \
-    PSD_Flicker, PSD_e_en, PSD_e_en_filtered, PSD_e_in, PSD_e_in_filtered, PSD_Total, PSD_Total_filtered, \
-    Display_all_PSD, NEMI, Display_all_PSD_filtered, NEMI_FIltered, NEMI_FIlteredv2, NEMI_FIlteredv3, PSD_R_cr_V2, \
-    PSD_R_cr_filtered_V2, PSD_R_Coil_V2, PSD_R_Coil_filtered_V2, PSD_Flicker_V2, PSD_e_en_V2, PSD_e_en_filtered_V2, \
-    PSD_e_in_V2, PSD_e_in_filtered_V2
+from src.model.strategies.strategy_lib.noise_optim import NSD_R_cr, NSD_R_Coil, NSD_Flicker, \
+    NSD_e_en, NSD_e_in, NSD_Total, Display_all_NSD, Display_all_PSD, Display_all_NSD_filtered, \
+    Display_all_PSD_filtered, NEMI, NSD_normalisation
 from src.model.strategies.strategy_lib.CLTF import CLTF_Strategy, Display_CLTF_OLTF, \
     Display_CLTF_OLTF_filtered
 from src.model.strategies.strategy_lib.OLTF import OLTF_Strategy
@@ -14,11 +12,10 @@ from src.model.strategies.strategy_lib.capacitance import AnalyticalCapacitanceS
 from src.model.strategies.strategy_lib.frequency import FrequencyVectorStrategy
 from src.model.strategies.strategy_lib.impedance import AnalyticalImpedanceStrategy
 from src.model.strategies.strategy_lib.inductance import AnalyticalInductanceStrategy
-from src.model.strategies.strategy_lib.lambda_strategy import LukoschusAnalyticalLambdaStrategy, ClercAnalyticalLambdaStrategy
+from src.model.strategies.strategy_lib.lambda_strategy import LukoschusAnalyticalLambdaStrategy, \
+    ClercAnalyticalLambdaStrategy
 from src.model.strategies.strategy_lib.mu_app import AnalyticalMu_appStrategy, AnalyticalMu_appDiaboloStrategy
 from src.model.strategies.strategy_lib.resistance import AnalyticalResistanceStrategy, MultiLayerResistanceStrategy
-from src.model.strategies.strategy_lib.SPICE import SPICE_test, SPICE_op_Amp_gain, SPICE_op_Amp_transcient, \
-    SPICE_impedance
 
 
 STRATEGY_MAP = {
@@ -42,7 +39,6 @@ STRATEGY_MAP = {
           "default": LukoschusAnalyticalLambdaStrategy,
           "strategies": [LukoschusAnalyticalLambdaStrategy, ClercAnalyticalLambdaStrategy]
      },
-
     "inductance": {
         "default": AnalyticalInductanceStrategy,
         "strategies": [AnalyticalInductanceStrategy]
@@ -79,65 +75,44 @@ STRATEGY_MAP = {
         "default": Display_CLTF_OLTF,
         "strategies": [Display_CLTF_OLTF, Display_CLTF_OLTF_filtered]
     },
-    "PSD_R_cr": {
-        "default": PSD_R_cr,
-        "strategies": [PSD_R_cr, PSD_R_cr_V2]
+    "NSD_normalisation": {
+        "default": NSD_normalisation,
+        "strategies": [NSD_normalisation]
     },
-    "PSD_R_cr_filtered": {
-        "default": PSD_R_cr_filtered,
-        "strategies": [PSD_R_cr_filtered,PSD_R_cr_filtered_V2]
+    "PSD_R_cr": {
+        "default": NSD_R_cr,
+        "strategies": [NSD_R_cr]
     },
     "PSD_R_Coil": {
-        "default": PSD_R_Coil,
-        "strategies": [PSD_R_Coil, PSD_R_Coil_V2]
-    },
-    "PSD_R_Coil_filtered": {
-        "default": PSD_R_Coil_filtered,
-        "strategies": [PSD_R_Coil_filtered, PSD_R_Coil_filtered_V2]
+        "default": NSD_R_Coil,
+        "strategies": [NSD_R_Coil]
     },
     "PSD_Flicker": {
-        "default": PSD_Flicker,
-        "strategies": [PSD_Flicker, PSD_Flicker_V2]
+        "default": NSD_Flicker,
+        "strategies": [NSD_Flicker]
     },
     "PSD_e_en": {
-        "default": PSD_e_en,
-        "strategies": [PSD_e_en, PSD_e_en_V2]
-    },
-    "PSD_e_en_filtered": {
-        "default": PSD_e_en_filtered,
-        "strategies": [PSD_e_en_filtered, PSD_e_en_filtered_V2]
+        "default": NSD_e_en,
+        "strategies": [NSD_e_en]
     },
     "PSD_e_in": {
-        "default": PSD_e_in,
-        "strategies": [PSD_e_in, PSD_e_in_V2]
-    },
-    "PSD_e_in_filtered": {
-        "default": PSD_e_in_filtered,
-        "strategies": [PSD_e_in_filtered, PSD_e_in_filtered_V2]
+        "default": NSD_e_in,
+        "strategies": [NSD_e_in]
     },
     "PSD_Total": {
-        "default": PSD_Total,
-        "strategies": [PSD_Total]
-    },
-    "PSD_Total_filtered": {
-        "default": PSD_Total_filtered,
-        "strategies": [PSD_Total_filtered]
+        "default": NSD_Total,
+        "strategies": [NSD_Total]
     },
     "Display_all_PSD": {
-        "default": Display_all_PSD,
-        "strategies": [Display_all_PSD]
+        "default": Display_all_NSD,
+        "strategies": [Display_all_NSD, Display_all_PSD]
     },
     "Display_all_PSD_filtered": {
-        "default": Display_all_PSD_filtered,
-        "strategies": [Display_all_PSD_filtered]
+        "default": Display_all_NSD_filtered,
+        "strategies": [Display_all_NSD_filtered, Display_all_PSD_filtered]
     },
     "NEMI": {
         "default": NEMI,
         "strategies": [NEMI]
     },
-    "NEMI_FIltered": {
-        "default": NEMI_FIltered,
-        "strategies": [NEMI_FIltered,NEMI_FIlteredv2, NEMI_FIlteredv3]
-    },
-
 }
