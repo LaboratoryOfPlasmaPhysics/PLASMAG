@@ -103,8 +103,8 @@ specifically designed for space magnetometers.
 At its core, PLASMAG serves as a comprehensive tool 
 for the parameters adjustment. 
 
-Author: CNRS-LPP, France, Maxime Ronceray, Malik Mansour,
-Claire Revillet, 
+Author: CNRS-LPP, France, Maxime Ronceray, 
+    Malik Mansour, Claire Revillet, 
 Version: 1.1.0
 
         """)
@@ -166,14 +166,16 @@ class EnlargedImageDialog(QDialog):
 
 
 def convert_unit(value, from_unit, to_unit):
-    """
-    Converts the given value from one unit to another using Pint.
+    """Converts the given value from one unit to another using Pint.
+
     Args:
         value (float): The value to convert.
         from_unit (str): The unit of the input value.
         to_unit (str): The target unit for the conversion.
+
     Returns:
         float: The converted value.
+
     """
     if from_unit and to_unit:
         return (value * ureg(from_unit)).to(ureg(to_unit)).magnitude
@@ -252,23 +254,25 @@ class MplCanvas(FigureCanvas):
 
 
 class MainGUI(QMainWindow):
-    """
-        The MainGUI class is responsible for creating and managing the graphical user interface of the
-        PLASMAG application.
-        It sets up input fields for parameters, sliders for adjustments, a plotting area for visualization, and
-         initiates calculations.
+    """Main Graphical User Interface window
 
-        Attributes:
-            currently_selected_input (tuple): A tuple containing the currently selected QLineEdit and its parameter
-             name.
-            central_widget (QWidget): The central widget of the QMainWindow.
-            main_layout (QVBoxLayout): The main layout containing all widgets.
-            inputs (dict): Dictionary mapping parameter names to their respective QLineEdit widgets.
-            global_slider_coarse (QSlider): The slider for coarse adjustments of parameter values.
-            global_slider_fine (QSlider): The slider for fine adjustments of parameter values.
-            calculate_btn (QPushButton): The button to trigger the calculation process.
-            canvas (MplCanvas): The matplotlib canvas for plotting calculation results.
-            controller (CalculationController): The controller handling the calculation logic.
+    The MainGUI class is responsible for creating and managing the graphical user interface of the
+    PLASMAG application.
+    It sets up input fields for parameters, sliders for adjustments, a plotting area for visualization, and
+    initiates calculations.
+
+    Attributes:
+        - currently_selected_input (tuple): A tuple containing the currently selected QLineEdit and
+          its parameter name.
+        - central_widget (QWidget): The central widget of the QMainWindow.
+        - main_layout (QVBoxLayout): The main layout containing all widgets.
+        - inputs (dict): Dictionary mapping parameter names to their respective QLineEdit widgets.
+        - global_slider_coarse (QSlider): The slider for coarse adjustments of parameter values.
+        - global_slider_fine (QSlider): The slider for fine adjustments of parameter values.
+        - calculate_btn (QPushButton): The button to trigger the calculation process.
+        - canvas (MplCanvas): The matplotlib canvas for plotting calculation results.
+        - controller (CalculationController): The controller handling the calculation logic.
+
     """
 
     def __init__(self, config_dict=None):

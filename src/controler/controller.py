@@ -56,22 +56,23 @@ class CalculationController:
 
     def update_parameters(self, params_dict):
         """
-               Updates the input parameters of the calculation engine using the provided dictionary. This method
-               also triggers the update of the engine's parameters and marks the output data as ready for plot.
+            Updates the input parameters of the calculation engine using the provided dictionary. This method
+            also triggers the update of the engine's parameters and marks the output data as ready for plot.
 
-               Parameters:
-               - params_dict (dict): A dictionary containing the new parameters to be updated in the engine.
+            Parameters:
+                - params_dict (dict): A dictionary containing the new parameters to be updated in the engine.
 
-               The dict should respect the following format:
+                    The dict should respect the following format::
 
-                {
-                    "param1": value1,
-                    "param2": value2,
-                    ...
-                }
+                        {
+                            "param1": value1,
+                            "param2": value2,
+                            ...
+                        }
 
-               Returns:
-               - dict: The current results after updating the parameters, if any calculation was previously run.
+            Returns:
+                - dict: The current results after updating the parameters, if any calculation was previously run.
+
            """
         self.params = params_dict
         new_parameters = InputParameters(self.params)
