@@ -145,7 +145,6 @@ class CalculationController:
 
         # Retrieve the results of the NEMI node if it exists
         data = self.get_current_results()
-        print("Data retrieved from get_current_results : " + str(data))
         if data is None:
             raise "Error: No data available"
 
