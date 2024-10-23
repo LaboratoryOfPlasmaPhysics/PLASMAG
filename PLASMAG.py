@@ -2,6 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication
 import json
 from src.view.gui import MainGUI
+version = "1.2.0"
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -11,6 +12,6 @@ if __name__ == "__main__":
 
 
 
-    window = MainGUI(config_dict=config_dict)
+    window = MainGUI(config_dict=config_dict, version=version)
     window.show()
     sys.exit(app.exec())

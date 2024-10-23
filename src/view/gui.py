@@ -14,7 +14,6 @@ from datetime import datetime
 from pint import UnitRegistry
 import numpy as np
 import pandas as pd
-
 from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal, QEvent, QUrl
 from PyQt6.QtWidgets import (
     QApplication,
@@ -90,12 +89,14 @@ class ResizableImageLabel(QLabel):
 
 
 class AboutDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, version=""):
         super().__init__(parent)
         self.setWindowTitle("About PLASMAG")
         self.setFixedSize(400, 300)
+        self.version = version
 
         layout = QVBoxLayout()
+
 
         label = QLabel(f"""
 PLASMAG is a simulation software 
@@ -103,9 +104,9 @@ specifically designed for space magnetometers.
 At its core, PLASMAG serves as a comprehensive tool 
 for the parameters adjustment. 
 
-Author: CNRS-LPP, France, Maxime Ronceray, Malik Mansour,
-Claire Revillet, 
-Version: 1.1.0
+Author: CNRS-(LPP,LPC2E), France, Maxime Ronceray(LPP), Malik Mansour(LPP),
+Claire Revillet(LPC2E), 
+Version: {self.version}
 
         """)
         layout.addWidget(label)
@@ -118,7 +119,7 @@ Version: 1.1.0
         self.setLayout(layout)
 
     def open_documentation(self):
-        QDesktopServices.openUrl(QUrl("https://forge-osuc.cnrs-orleans.fr/projects/plasmag/wiki/Wiki"))
+        QDesktopServices.openUrl(QUrl("https://plasmag.readthedocs.io/en/master/"))
 
 
 class EnlargedImageDialog(QDialog):
@@ -271,7 +272,7 @@ class MainGUI(QMainWindow):
             controller (CalculationController): The controller handling the calculation logic.
     """
 
-    def __init__(self, config_dict=None):
+    def __init__(self, config_dict=None, version=""):
         super().__init__()
         self.background_buttons = None
         self.config_dict = config_dict
@@ -309,6 +310,7 @@ class MainGUI(QMainWindow):
         self.saved_spice_strategies = []
         self.saved_spice_parameters = []
         self.first_run = True
+        self.version = version
         current_dir = os.path.dirname(os.path.realpath(__file__))
         self.data_path = os.path.join(current_dir, '..', '..', 'data')
 
@@ -344,7 +346,7 @@ class MainGUI(QMainWindow):
         self.spice_circuit_combo.setCurrentIndex(index)
 
     def show_about_dialog(self):
-        dialog = AboutDialog(self)
+        dialog = AboutDialog(self, version=self.version)
         dialog.exec()
 
     def load_spice_configs(self):
@@ -950,7 +952,7 @@ class MainGUI(QMainWindow):
         change_plot_count_action.triggered.connect(self.change_plot_count)
 
         help_menu = main_menu.addMenu('&Help')
-        about_action = help_menu.addAction('&About PLASMAG')
+        about_action = help_menu.addAction('About PLASMAG')
         about_action.triggered.connect(self.show_about_dialog)
 
         export_dep_tree_action = help_menu.addAction('&Export Dependency Tree')
