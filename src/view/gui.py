@@ -976,8 +976,11 @@ class MainGUI(QMainWindow):
 
     def export_CLTF_NEMI(self):
         try:
-            # Get the path to save the dependency tree
-            path, _ = QFileDialog.getSaveFileName(self, "Export CLTF NEMI", "", "json Files (*.png)")
+            # Get the path to save the CLTF_NEMI image
+            path, _ = QFileDialog.getSaveFileName(self, "Export CLTF NEMI", "", "PNG Files (*.png)")
+            # if no .png extension is provided, add it
+            if not path.endswith(".png"):
+                path += ".png"
             message = self.controller.export_CLTF_NEMI(path)
             QMessageBox.information(self, "Export Successful", "The CLTF NEMI has been exported successfully.")
         except Exception as e:

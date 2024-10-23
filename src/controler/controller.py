@@ -141,14 +141,17 @@ class CalculationController:
         :return: SUCCESS or ERROR
         """
 
+        print("Exporting CLTF and NEMI data from controler to : " + str(path))
+
         # Retrieve the results of the NEMI node if it exists
         data = self.get_current_results()
+        print("Data retrieved from get_current_results : " + str(data))
         if data is None:
             raise "Error: No data available"
 
         # Retrieve the results of the CLTF_Filtered node if it exists
         try:
-            cltf_data = data.get("CLTF_Filtered", None)
+            cltf_data = data.get("CLTF", None)
             nemi_data = data.get("NEMI", None)
 
         except KeyError:
@@ -185,14 +188,12 @@ class CalculationController:
 
             path = str(path)
 
-            #if the path does not end with .png
+            #if the path does not end with .png, add the extension
             if not path.endswith(".png"):
                 path += ".png"
 
             print("Saving plot to : " + path)
-
             plt.savefig(path)
-
 
             return "SUCCESS"
         except Exception as e:
