@@ -955,6 +955,9 @@ class MainGUI(QMainWindow):
         about_action = help_menu.addAction('About PLASMAG')
         about_action.triggered.connect(self.show_about_dialog)
 
+        open_documentation_btn = help_menu.addAction('Open Documentation')
+        open_documentation_btn.triggered.connect(self.open_documentation)
+
         export_dep_tree_action = help_menu.addAction('&Export Dependency Tree')
         export_dep_tree_action.triggered.connect(self.export_dependency_tree)
 
@@ -988,6 +991,11 @@ class MainGUI(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Export Failed",
                                  f"An error occurred while exporting the CLTF NEMI: {str(e)}")
+
+    def open_documentation(self):
+        print("Open documentation")
+        QDesktopServices.openUrl(QUrl("https://plasmag.readthedocs.io/en/master/"))
+        print("Documentation opened")
 
     def display_graph(self, clustering_type="degree"):
         """
