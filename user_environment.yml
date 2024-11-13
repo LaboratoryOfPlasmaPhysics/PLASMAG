@@ -1,7 +1,7 @@
 name: PLASMAG
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
   - python=3.9.18
   - matplotlib=3.8.3

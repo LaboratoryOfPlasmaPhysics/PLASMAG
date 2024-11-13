@@ -7,11 +7,12 @@ from PLASMAG import version
 sys.path.insert(0, os.path.abspath('../src'))
 
 project = 'PLASMAG'
-copyright = '2024, Maxime RONCERAY'
-author = 'Maxime RONCERAY'
+copyright = '2024, Maxime RONCERAY, Claire REVILLET'
+author = 'Maxime RONCERAY, Claire REVILLET'
 release = version
 
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosectionlabel']
+autoclass_content = 'class'
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

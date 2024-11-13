@@ -9,13 +9,14 @@ import matplotlib.colors as mcolors
 
 
 def add_nodes_edges(graph, data, parent=None, skip_frequency_vector=False):
-    """
-    Add nodes and edges to the graph recursively.
+    """ Add nodes and edges to the graph recursively.
+
     :param graph:
     :param data:
     :param parent:
     :param skip_frequency_vector:
     :return:
+
     """
     if isinstance(data, dict):
         for key, value in data.items():
@@ -26,13 +27,15 @@ def add_nodes_edges(graph, data, parent=None, skip_frequency_vector=False):
                 graph.add_edge(parent, key)
             add_nodes_edges(graph, value, key)
 
+
 def add_title_description(html_file_path, title, description):
-    """
-    Add a title and description to the right of the graph in the HTML file.
+    """Add a title and description to the right of the graph in the HTML file.
+
     :param html_file_path:
     :param title:
     :param description:
     :return:
+
     """
 
     # Read the HTML file content
@@ -81,13 +84,14 @@ def add_title_description(html_file_path, title, description):
 
 
 def create_tree(data, file_name_export, type="community", skip_frequency_vector=True):
-    """
-    Create a tree network visualization from the data and save it to an HTML file.
+    """Create a tree network visualization from the data and save it to an HTML file.
+
     :param data:  The data to visualize as a tree.
     :param file_name_export:  The name of the HTML file to save the visualization to.
     :param type:  The type of visualization to create. Can be "community", "degree", or "distance".
     :param skip_frequency_vector:  Whether to skip the frequency vector nodes in the visualization.
     :return:  None
+
     """
     G = nx.DiGraph()
     add_nodes_edges(G, data, skip_frequency_vector=skip_frequency_vector)
@@ -247,4 +251,3 @@ if __name__ == "__main__":
     html_file_path = "network_distance.html"
     title = "Network Distance"
     description = "This is a test description."
-
