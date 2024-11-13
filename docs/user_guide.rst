@@ -106,14 +106,19 @@ grouped by category.
 How to change a parameter
 """""""""""""""""""""""""
 
-Option 1 : - Click on the line edit field of the parameter you want to
-change - Enter the new value - Press Enter - If the value is valid, the
-calculation will be triggered. If the value is invalid, the field will
-turn red and the calculation will not be triggered.
+Option 1:
 
-Option 2: - Click on the line edit field of the parameter you want to
-change - Use the sliders to change the value, the value will be updated
-in real time and the calculation will be triggered
+- Click on the line edit field of the parameter you want to change
+- Enter the new value
+- Press Enter
+- If the value is valid, the calculation will be triggered. If the value is invalid, the field
+  will turn red and the calculation will not be triggered.
+
+Option 2:
+
+- Click on the line edit field of the parameter you want to change
+- Use the sliders to change the value, the value will be updated in real time and the calculation
+  will be triggered
 
 .. figure:: images/img_6.png
 
@@ -131,7 +136,7 @@ One of the most importants features of PLASMAG is to be modular and to
 allow the user to choose the strategy he wants to use to simulate a
 particular value (like the resistance, the capacitance, etc…). You can
 easily implement your own strategy by following the instructions in the
-`Contributing Guide <contributing.md>`__. If you did everything well,
+:ref:`contributing new code` section. If you did everything well,
 your strategy will appear in the strategy selection combobox. You can
 now select it and it will be used in the simulation.
 
