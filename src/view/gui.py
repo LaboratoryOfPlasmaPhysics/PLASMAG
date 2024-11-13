@@ -111,11 +111,6 @@ Version: {self.version}
         """)
         layout.addWidget(label)
 
-        # Ajoutez d'autres widgets selon vos besoins, par exemple un lien vers la documentation.
-        doc_button = QPushButton("Open Documentation")
-        doc_button.clicked.connect(self.open_documentation)
-        layout.addWidget(doc_button)
-
         self.setLayout(layout)
 
     def open_documentation(self):
