@@ -110,7 +110,7 @@
             "default": 1.6,
             "min": 1,
             "max": 10,
-            "description": "Linear resistance of the wire",
+            "description": "Linear resistance of the wire in Ohm/m",
             "input_unit": "ohm/meter",
             "target_unit": "ohm/meter"
         },
@@ -186,9 +186,9 @@
             "default": 1.0,
             "min": 0,
             "max": 1,
-            "description": "Mutual inductance",
-            "input_unit": "dimensionless",
-            "target_unit": "dimensionless"
+            "description": "Mutual inductance in Henry",
+            "input_unit": "H",
+            "target_unit": "H"
         },
         "feedback_resistance": {
             "default": 1000.0,
@@ -262,7 +262,7 @@
             "max": 34,
             "description": "e_en",
             "input_unit": "nV/(Hz**.5)",
-            "target_unit": "nV/(Hz**.5)"
+            "target_unit": "V/(Hz**.5)"
         },
         "e_in": {
             "default": 1.0,
