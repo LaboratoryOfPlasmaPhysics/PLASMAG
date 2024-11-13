@@ -29,6 +29,10 @@ models.
 Licence
 -------
 
+This software has been release under the GNU General Public License Version 3
+
+Please read the LICENSE file in the repository for more details.
+
 Acknowledgments
 ---------------
 
