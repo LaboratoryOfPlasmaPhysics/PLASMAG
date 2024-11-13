@@ -1653,6 +1653,7 @@ class MainGUI(QMainWindow):
             available_results = None
         if 'frequency_vector' in available_results:
             available_results.remove('frequency_vector')
+            available_results.remove('NSD_normalisation')
             available_results.sort(key=lambda x: x.lower())
 
         # Loop through each plot and remember the current selection
