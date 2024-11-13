@@ -90,12 +90,14 @@ class ResizableImageLabel(QLabel):
 
 
 class AboutDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, version=""):
         super().__init__(parent)
         self.setWindowTitle("About PLASMAG")
         self.setFixedSize(400, 300)
+        self.version = version
 
         layout = QVBoxLayout()
+
 
         label = QLabel(f"""
 PLASMAG is a simulation software 
@@ -103,9 +105,9 @@ specifically designed for space magnetometers.
 At its core, PLASMAG serves as a comprehensive tool 
 for the parameters adjustment. 
 
-Author: CNRS-LPP, France, Maxime Ronceray, 
-    Malik Mansour, Claire Revillet, 
-Version: 1.1.0
+Authors: CNRS-(LPP,LPC2E), France, Maxime Ronceray(LPP), 
+  Malik Mansour(LPP), Claire Revillet(LPC2E), 
+Version: {self.version}
 
         """)
         layout.addWidget(label)
@@ -118,7 +120,7 @@ Version: 1.1.0
         self.setLayout(layout)
 
     def open_documentation(self):
-        QDesktopServices.openUrl(QUrl("https://forge-osuc.cnrs-orleans.fr/projects/plasmag/wiki/Wiki"))
+        QDesktopServices.openUrl(QUrl("https://plasmag.readthedocs.io/en/master/"))
 
 
 class EnlargedImageDialog(QDialog):
@@ -275,7 +277,7 @@ class MainGUI(QMainWindow):
 
     """
 
-    def __init__(self, config_dict=None):
+    def __init__(self, config_dict=None, version=""):
         super().__init__()
         self.background_buttons = None
         self.config_dict = config_dict
@@ -313,6 +315,7 @@ class MainGUI(QMainWindow):
         self.saved_spice_strategies = []
         self.saved_spice_parameters = []
         self.first_run = True
+        self.version = version
         current_dir = os.path.dirname(os.path.realpath(__file__))
         self.data_path = os.path.join(current_dir, '..', '..', 'data')
 
@@ -348,7 +351,7 @@ class MainGUI(QMainWindow):
         self.spice_circuit_combo.setCurrentIndex(index)
 
     def show_about_dialog(self):
-        dialog = AboutDialog(self)
+        dialog = AboutDialog(self, version=self.version)
         dialog.exec()
 
     def load_spice_configs(self):
@@ -954,8 +957,11 @@ class MainGUI(QMainWindow):
         change_plot_count_action.triggered.connect(self.change_plot_count)
 
         help_menu = main_menu.addMenu('&Help')
-        about_action = help_menu.addAction('&About PLASMAG')
+        about_action = help_menu.addAction('About PLASMAG')
         about_action.triggered.connect(self.show_about_dialog)
+
+        open_documentation_btn = help_menu.addAction('Open Documentation')
+        open_documentation_btn.triggered.connect(self.open_documentation)
 
         export_dep_tree_action = help_menu.addAction('&Export Dependency Tree')
         export_dep_tree_action.triggered.connect(self.export_dependency_tree)
@@ -980,13 +986,21 @@ class MainGUI(QMainWindow):
 
     def export_CLTF_NEMI(self):
         try:
-            # Get the path to save the dependency tree
-            path, _ = QFileDialog.getSaveFileName(self, "Export CLTF NEMI", "", "json Files (*.png)")
+            # Get the path to save the CLTF_NEMI image
+            path, _ = QFileDialog.getSaveFileName(self, "Export CLTF NEMI", "", "PNG Files (*.png)")
+            # if no .png extension is provided, add it
+            if not path.endswith(".png"):
+                path += ".png"
             message = self.controller.export_CLTF_NEMI(path)
             QMessageBox.information(self, "Export Successful", "The CLTF NEMI has been exported successfully.")
         except Exception as e:
             QMessageBox.critical(self, "Export Failed",
                                  f"An error occurred while exporting the CLTF NEMI: {str(e)}")
+
+    def open_documentation(self):
+        print("Open documentation")
+        QDesktopServices.openUrl(QUrl("https://plasmag.readthedocs.io/en/master/"))
+        print("Documentation opened")
 
     def display_graph(self, clustering_type="degree"):
         """
