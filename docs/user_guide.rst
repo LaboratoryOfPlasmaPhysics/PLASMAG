@@ -248,10 +248,18 @@ Here are the strategies for each stage and for the whole ASIC.
 Open Loop Transfer Function (OLTF)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+This strategy returns 2 transfer functions: the first one "OLTF" is not impacted by the ASIC's 2nd
+stage, the second "OLTF_filtered" is filtered by the ASIC's 2nd stage.
+Both are plotted together on the "OLTF" plot.
+
 .. autoclass:: src.model.strategies.strategy_lib.OLTF.OLTF_Strategy
 
 Closed Loop Transfer Function (CLTF)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This strategy returns 2 transfer functions: the first one "CLTF" is not impacted by the ASIC's 2nd
+stage, the second "CLTF_filtered" is filtered by the ASIC's 2nd stage.
+Both are plotted together on the "CLTF" plot.
 
 .. autoclass:: src.model.strategies.strategy_lib.CLTF.CLTF_Strategy
 
@@ -264,6 +272,16 @@ Spectral Densities)
 
 They can be rendered in :math:`\frac{V^2}{Hz}` (real Power Spectral Density) by using
 "Display_all_PSD_strategy" in the *Strategy Selection* tab.
+
+Except for the Flicker noise spectral density, all the spectral density strategies return 2
+quantities: the first one "NSD_XX" is not impacted by the ASIC's 2nd
+stage, the second "NSD_XX_filtered" is filtered by the ASIC's 2nd stage.
+Both are plotted together on the "NSD_XX" plot.
+
+The "NSD_filtered_Total" is the quadratic sum of the filtered NSD_XX.
+
+All the filtered spectral densities are plotted together on the "Display_all_PSD_filtered" while
+all the non-filtered are plotted together on the "Display_all_PSD"
 
 
 .. autoclass:: src.model.strategies.strategy_lib.Noise.NSD_R_cr
