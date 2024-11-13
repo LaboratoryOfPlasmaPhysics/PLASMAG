@@ -87,6 +87,7 @@ Documentation
 ^^^^^^^^^^^^^
 
 Depending on what you modified in the code, you may need to:
+
 - update docstrings (changes in parameters, behaviour...) in the python files
 - update the description of a feature in the user guide
 - add a new module in the API reference guide
@@ -168,20 +169,130 @@ Fixing bugs
 Improving documentation
 -----------------------
 
+.. .. _contributing new code:
+
 Contributing new code
 ---------------------
 
 Improving the analytical model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. _adding new physical quantity:
+
 adding a new physical quantity as input of the model (no computing strategy)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The parameters asked to the user are listed in the *default.json* file.
+Each parameter must be added to a section like this::
+
+   { "<section_name>":
+     {
+       "<param_name>": {
+         "default": <default numerical value>,
+         "min": <minimum numerical value>,
+         "max": <maximum numerical value>,
+         "description": "<Short description, displayed in tooltip>",
+         "input_unit": "<unit used in the user interface>",
+         "target_unit": "<unit used in equations>"
+       }
+     }
+   }
+
+where:
+
+- section_name and param_name are the names used in the user interface
+- default, min and max numerical values are given in the unit described in “input_unit”.
+
+Note that PLASMAG is using the `Pint library <https://pint.readthedocs.io/en/stable/index.html>`__
+to deal with unit conversion. So don't hesitate to
+choose the most readable unit for "input_unit".
+For dimensionless parameters, you can either let the units to "" or set it to "dimensionless".
+
+.. _adding new strategy:
 
 adding a new strategy to an existing physical quantity (Node)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Each strategy of a node is a class in a python module. To add a new strategy to an existing node,
+you just have to add a new class to it's module and add the name of the new class to the list of
+strategies of this node in ``scm_model.py``.
+
+Here is an example of a strategy class::
+
+   class MyNewFooCalculationStrategy(CalculationStrategy):
+       """ Analytical model for Foo
+
+       .. math::
+
+           Foo(f) = dep_1 . param_1
+
+       With:
+           - :math:`dep_1` : <short description of the variable>
+           - :math:`param_1` : <short description of the parameter>
+
+       """
+       def calculate(self, dependencies, parameters):
+           # retrieve user's parameters
+           param1 = parameters.data["param1"]
+
+           # retrieve values from other nodes
+           frequency_vector = dependencies["frequency_vector"]["data"]
+           dep1 = dependencies["dependency1"]["data"][:, 1]
+
+           # Custom calculation logic here
+           result = dep1 * param1
+
+           # results must be returned as a tensor if the quantity depends on another one
+           results = column_stack((frequency_vector, result))
+
+           # the return format is a dictionary with the numerical results stored in "data", the
+           # labels and units used for plot legend.
+           return {
+               "data": results,
+               "labels": ["Frequency", "myFoo"],
+               "units": ["Hz", "<Foo unit>"]
+           }
+
+       @staticmethod
+       def get_dependencies():
+           # this methode must return the list of user parameters and node values used as input to
+           # the strategy calculation
+           return ["dependency1", "frequency_vector", "param1"]
+
+In this example, the calculation uses the user parameter *param1* and the result of the calculation
+of the node *dependency1* along with the *frequency_vector*. The three inputs of this calculation
+need to be listed in the *get_dependencies* return list.
+
+The calculate method must return a dictionary containing the values of the physical quantity in
+"data" (it must be a tensor if your physical quantity varies with time or frequency),
+the plot labels and the units in the "labels" and "units" lists (even if your physical quantity
+is static).
+
+.. note:: Don't forget to document your new strategy and to add it to ``user_guide.rst`` and to the API reference.
+
+Once your strategy is written, you have to add it to the model (``scm_model.py``). First import it::
+
+   from src.model.strategies.strategy_lib.MyFoo import MyFooCalculationStrategy, MyNewFooCalculationStrategy
+
+Then add it to the strategy list for Foo (and decide if it should become the new default or not)::
+
+       "myFoo": {
+          "default": MyFooCalculationStrategy,
+          "strategies": [MyFooCalculationStrategy, MyNewFooCalculationStrategy]
+       },
+
+
 adding a new computable physical quantity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you understand the steps of :ref:`adding new physical quantity` and of
+:ref:`adding new strategy`, adding a new computable physical quantity is quite easy:
+
+#. create a new module in *src/model/strategies/strategy_lib* for your new node
+#. implement one or more strategies for it
+#. add new user parameters if needed
+#. add your new node and its strategies to the model (``scm_model.py``)
+
 
 Improving the SPICE feature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
