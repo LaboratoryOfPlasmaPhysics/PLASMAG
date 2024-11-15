@@ -69,7 +69,7 @@ Global presentation of the User Interface
 The UI is divided into three main sections: the menubar, the parameter
 panel, and the canvas.
 
-.. figure:: images/img.png
+.. figure:: images/full_app.png
 
 Menubar
 ^^^^^^^
@@ -77,7 +77,10 @@ Menubar
 The menubar is located at the top of the window and contains the
 following menus:
 
-.. figure:: images/img_2.png
++---------------------------------+------------------------------------+---------------------------------+
+| .. image:: images/menu_file.jpg | .. image:: images/menu_options.jpg | .. image:: images/menu_help.jpg |
++---------------------------------+------------------------------------+---------------------------------+
+
 
 - **File:** this menu gives access to import and export features
   (see the *Feature* section below for more details)
@@ -90,14 +93,14 @@ following menus:
 Tabs
 ^^^^
 
-.. figure:: images/img_4.png
+.. figure:: images/tabs.png
 
 It’s used to switch between different functionalities of the program.
 
 Parameters Section
 ~~~~~~~~~~~~~~~~~~
 
-.. figure:: images/img_5.png
+.. figure:: images/parameters.png
 
 The parameters section is located on the left side of the window and
 contains the parameters of the simulation. All of the parameters are
@@ -120,7 +123,7 @@ Option 2:
 - Use the sliders to change the value, the value will be updated in real time and the calculation
   will be triggered
 
-.. figure:: images/img_6.png
+.. figure:: images/sliders.jpg
 
 At every moment, you can reset the value of a parameter by clicking on
 the reset button. Or force trigger the calculation by clicking on the
@@ -130,7 +133,7 @@ the frequency range you want to simulate.
 Strategy selection
 ~~~~~~~~~~~~~~~~~~
 
-.. figure:: images/img_7.png
+.. figure:: images/strategies.png
 
 One of the most importants features of PLASMAG is to be modular and to
 allow the user to choose the strategy he wants to use to simulate a
@@ -153,7 +156,7 @@ plots of the simulation. You can adjust the number of plots displayed by
 clicking on the options button and changing the plot count (from 1 to 5,
 default 3)
 
-.. figure:: images/img_9.png
+.. figure:: images/plot_selection_menu.jpg
 
 Using the combo box you can chose to display whatever you want in the
 plot. The list contains every node that can be calculated in the
@@ -304,12 +307,15 @@ all the non-filtered are plotted together on the "Display_all_PSD"
 SPICE
 ^^^^^
 
+.. figure:: images/spice.png
+
+
 Parameters export and import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Through the *File* menu in the menubar, you can export or import parameters and data.
 
-.. figure:: images/img_1.png
+.. figure:: images/menu_file.jpg
 
 The JSON format has been chosen to allow both user and computer to read and write the parameters files
 easily.
