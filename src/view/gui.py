@@ -112,11 +112,6 @@ Version: {self.version}
         """)
         layout.addWidget(label)
 
-        # Ajoutez d'autres widgets selon vos besoins, par exemple un lien vers la documentation.
-        doc_button = QPushButton("Open Documentation")
-        doc_button.clicked.connect(self.open_documentation)
-        layout.addWidget(doc_button)
-
         self.setLayout(layout)
 
     def open_documentation(self):
@@ -1083,6 +1078,7 @@ class MainGUI(QMainWindow):
             self.update_canvas_count(num)
 
     def update_canvas_count(self, num_plots):
+
         for toolbar in self.toolbars:
             toolbar.setParent(None)
             toolbar.deleteLater()
@@ -1106,8 +1102,10 @@ class MainGUI(QMainWindow):
         self.comboboxes.clear()
 
         self.clear_plot_layout()
+        self.canvases.clear()
 
         self.init_canvas(num_plots)
+        self.calculate()
 
     def load_background_curve(self, canvas_index):
         try:
