@@ -4,7 +4,7 @@ import numpy as np
 from PyQt6.QtCore import pyqtSignal, QThread
 from deap import creator, base, tools, algorithms
 
-from model.optimisation.impedance_strategy_map import IMPEDANCE_STRATEGY_MAP
+from src.model.optimisation.impedance_strategy_map import IMPEDANCE_STRATEGY_MAP
 from src.controler.controller import CalculationController
 
 parameters_dict = {
