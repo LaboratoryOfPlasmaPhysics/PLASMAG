@@ -2,7 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication
 import json
 from src.view.gui import MainGUI
-version = "1.2.0"
+version = "1.2.2"
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

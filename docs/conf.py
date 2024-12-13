@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath('../'))
 project = 'PLASMAG'
 copyright = '2024, Maxime RONCERAY, Claire REVILLET'
 author = 'Maxime RONCERAY, Claire REVILLET'
-release = "1.2.1"
+release = "1.2.2"
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosectionlabel']
 autoclass_content = 'class'
